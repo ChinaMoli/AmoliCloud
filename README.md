@@ -6,3 +6,5 @@
 用户评价：Amoli私有云是私有云存储领域优秀的开源PHP建站系统，功能强大，深不可测。
 
 # 预览/Demo
+
+<https://new.amoli.co>
