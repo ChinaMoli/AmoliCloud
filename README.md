@@ -30,6 +30,7 @@ Releases：<https://github.com/ChinaMoli/AmoliCloud/releases>，或使用git
 ## 更新日志/ChangeLog
 ```
 version 4.0.1 2019-05-26
+
     [新增] 前端验证开关(前端密码留空即为不开启)
 ```
 更多：[CHANGELOG.md](https://github.com/ChinaMoli/AmoliCloud/blob/master/CHANGELOG.md)
@@ -37,7 +38,6 @@ version 4.0.1 2019-05-26
 ## 后续可能的改动/Preview
 ```
 增加本地存储
-[划掉] 增加首页验证开关
 ```
 
 ## 开源协议/License
