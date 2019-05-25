@@ -29,20 +29,10 @@ Releases：<https://github.com/ChinaMoli/AmoliCloud/releases>，或使用git
 
 ## 更新日志/ChangeLog
 ```
-version 4.0.0 2019-05-21
-    [项目] 代码完全重构
-    [项目] 前端采用Bootstrap4和layer构建
-    [项目] 后端采用开源项目layuicms构建
-    [新增] 支持OSS自定义域名
-    [新增] 前端密码验证，正确输入密码后才可进入
-    [新增] 前端支持部分文件在线预览
-    [新增] 前端根据文件后缀名显示不同图标
-    [优化] 安装步骤，安装成功率
-    [优化] 前端全部使用Ajax异步请求提升用户访问
-    [优化] 自动刷新文件不再使用手动
-    [优化] 后台更改为响应式，手机端也可以操作
-    [修复] 文件URL带特殊符号时下载不正常
+version 4.0.1 2019-05-26
+    [新增] 前端验证开关(前端密码留空即为不开启)
 ```
+更多：[CHANGELOG.md](https://github.com/ChinaMoli/AmoliCloud/blob/master/CHANGELOG.md)
 
 ## 后续可能的改动/Preview
 ```
