@@ -7,5 +7,5 @@
 
 # 预览/Demo
 
-*<https://new.amoli.co>
-*![](https://i.loli.net/2019/05/26/5ce9b3ceca63145762.png)
+*  <https://new.amoli.co>
+* ![](https://i.loli.net/2019/05/26/5ce9b3ceca63145762.png)
