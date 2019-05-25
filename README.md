@@ -1,7 +1,10 @@
 # AmoliCloud
 本项目于hai5和oneindex类似，不占用服务器空间，不走服务器流量，直接列出 阿里云OSS 目录和文件。
+
 在具备PHP代码执行环境和OSS对象存储服务的条件下，作为云HTTP文件服务器，提供简单的文件列表、上传下载、管理等功能。
+
 相较于将文件直接存放在本地，OSS则无存储总量限制、传输速率限制、低可靠数据安全等问题，对于移动终端也有良好的支持性。
+
 用户评价：Amoli私有云是私有云存储领域优秀的开源PHP建站系统，功能强大，深不可测。
 
 ## 预览/Demo
@@ -48,4 +51,26 @@ version 4.0.0 2019-05-21
 ```
 
 ## 开源协议/License
-[GNU General Public License v3.0](https://github.com/ChinaMoli/AmoliCloud/blob/master/LICENSE)
+```
+MIT License
+
+Copyright (c) 2019 ChinaMoli
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
