@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title> - 简约而不简单的私有云</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<link rel="shortcut icon" href="/favicon.ico"/>
+	<link rel="stylesheet" href="static/css/bootstrap.min.css">
+	<script src="https://at.alicdn.com/t/font_1186130_2tdvadczmrp.js"></script>
+	<script src="static/js/jquery.min.js"></script>
+	<script src="static/js/bootstrap.min.js"></script>
+	<script src="static/layer/layer.js"></script>
+	<style type="text/css">
+	.ico{width:18px}.size{width:100px}.time{width:140px}.icon{width:1em;height:1em;vertical-align:-0.15em;fill:currentColor;overflow:hidden;}
+	</style>
+</head>
+
+<body>
+	<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+		<div class="container">
+			<b><a class="navbar-brand" href="/"></a></b>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="collapsibleNavbar">
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<a class="nav-link" href="/">首页</a>
+					</li>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">友情链接</a>
+						<div class="dropdown-menu">
+							<a class="dropdown-item" target="_blank" href="https://wums.cn">无名氏Studio</a>
+						</div>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="Ajax.php?act=logout">退出</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<br>
+	<div class="container">
+		<ol class="breadcrumb">
+			<a class="breadcrumb-item" href="javascript:;" onclick="getList('')">首页</a>
+			<span id="nav"></span>
+		</ol>
+		<table class="table table-hover table-bordered table-sm">
+			<thead class="table-active">
+				<th class="ico"></th>
+				<th>Name</th>
+				<th class="size text-right">Size</th>
+				<th class="time text-center">Time</th>
+			</thead>
+			<tbody id="list">
+				<th class="text-center" colspan="4">暂无数据</th>
+			</tbody>
+		</table>
+	</div>
+	<div class="footer">
+		<p align="center">
+			<span>Copyright &copy; 2019 Powered by <a target="_blank" href="https://www.amoli.co">Amoli.Co</a>&nbsp;</span><span id='record'></span>
+		</p>
+	</div>
+	<script src="static/js/main.js"></script>
+</body>
+
+</html>

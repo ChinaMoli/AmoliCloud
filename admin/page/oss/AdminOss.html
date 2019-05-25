@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>管理OSS - Amoli私有云</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+	<link rel="stylesheet" href="../../css/public.css" media="all" />
+	<link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css">
+</head>
+
+<body class="childrenBody">
+	<input type="hidden" id="NowDir"></input>
+	<table id="List" lay-filter="List"></table>
+	<!--操作-->
+	<script type="text/html" id="ListBar">
+		{{#  if(d.type != 'wjj' && d.type != 'reply'){ }}
+			<a class="layui-btn layui-btn-xs layui-bg-blue" lay-event="down">下载</a>
+			<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+		{{#  } }}
+	</script>
+	<!--工具栏-->
+	<script type="text/html" id="Headbar">
+		<div class="layui-btn-container">
+		  <button class="layui-btn layui-btn-sm layui-bg-red" lay-event="Upload">上传文件</button>
+		</div>
+	</script>
+	<script type="text/javascript" src="../../layui/layui.js"></script>
+	<script type="text/javascript" src="AdminOss.js"></script>
+</body>
+
+</html>
