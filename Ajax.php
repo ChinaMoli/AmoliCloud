@@ -13,8 +13,9 @@ $accessKeyId = $C->get('accessKeyId');
 $accessKeySecret = $C->get('accessKeySecret');
 $indexpass = md5($C->get('indexpass'));
 $Cookie=$_COOKIE['Amoli_index'];
-$log=true;
-if(!isset($Cookie) || $Cookie != $indexpass){
+if($Cookie == $indexpass || $C->get('indexpass') == ''){
+    $log=true;
+}else{
     $log=false;
 }
 use OSS\OssClient;
