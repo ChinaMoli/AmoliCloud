@@ -13,7 +13,7 @@
 
 ## 部署/Build
 * 环境：
-PHP >= 5.6，cURL()支持
+PHP >= 5.6 推荐7.x，cURL()支持
 * 下载：
 Releases：<https://github.com/ChinaMoli/AmoliCloud/releases>，或使用git：
 ~~~
