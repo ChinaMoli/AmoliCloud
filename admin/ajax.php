@@ -198,6 +198,9 @@ switch($act){
             'server' => PHP_OS,
             'host' => $_SERVER['HTTP_HOST'],
             'root' => $_SERVER['DOCUMENT_ROOT'],
+            'server_software' => $_SERVER['SERVER_SOFTWARE'],
+            'php_version' => PHP_VERSION,
+            'upload_max' => get_cfg_var("upload_max_filesize"),
             'loginTime' => $C->get('loginTime')
         ];
         break;

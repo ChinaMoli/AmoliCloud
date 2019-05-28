@@ -19,11 +19,14 @@ layui.use(['form', 'element', 'layer', 'jquery'], function () {
         success: function (data) {
             var item = data.data;
             user = item.user;
-            $(".version").text(item.version);     //当前版本
-            $(".server").text(item.server);       //服务器环境
-            $(".host").text(item.host);           //服务器 (IP/端口)
-            $(".root").text(item.root);           //安装目录
-            $(".loginTime").text(item.loginTime); //上次登录时间
+            $(".version").text(item.version);// 当前版本
+            $(".php_version").text(item.php_version);// PHP版本
+            $(".server").text(item.server);// 服务器环境
+            $(".host").text(item.host);// 服务器 (IP/端口)
+            $(".server_software").text(item.server_software);// 脚本解释引擎
+            $(".upload_max").text(item.upload_max);// 允许最大上传文件
+            $(".root").text(item.root);// 安装目录
+            $(".loginTime").text(item.loginTime);// 上次登录时间
         }
     })
 })
