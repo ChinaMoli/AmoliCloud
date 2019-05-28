@@ -286,7 +286,6 @@ switch($act){
         break;
     default:
         $result=['msg' => 'No Act!'];
-
 }
 // 判断是否登录(排除登录操作)
 $result=['code'=>'0','data'=>$result];

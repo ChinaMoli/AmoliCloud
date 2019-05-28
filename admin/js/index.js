@@ -17,10 +17,12 @@ layui.use(['bodyTab', 'form', 'element', 'layer', 'jquery'], function () {
 	// 判断是否登录
 	$(function () {
 		$.ajax({
-			url: "ajax.php",
+			url: "ajax.php?act=systemParameter",
 			dataType: "json",
 			success: function (data) {
-				if (data.code != "0") {
+				if (data.code == "0") {
+					$('.userName').text(data.data.user);
+				}else{
 					window.location.href = "login.html";
 				}
 			}
