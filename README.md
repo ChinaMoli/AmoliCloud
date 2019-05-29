@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://i.imgur.com/LnPvZvO.png" alt="ADPlayer" width="100">
+<img src="https://github.com/ChinaMoli/AmoliCloud/blob/master/admin/images/Amoli.png" alt="AmoliCloud" width="100">
 </p>
 <h1 align="center">AmoliCloud</h1>
 本项目于hai5和oneindex类似，不占用服务器空间，不走服务器流量，直接列出 阿里云OSS 目录和文件。
