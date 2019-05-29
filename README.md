@@ -3,7 +3,7 @@
 </p>
 <h1 align="center">AmoliCloud</h1>
 
-> 😊 哈哈
+> 😊 私有云存储系统，支持本地、阿里云OSS，提供简单的文件列表、上传下载、管理等功能。
 
 [![npm](https://img.shields.io/npm/l/dplayer.svg?style=flat-square)](https://github.com/ChinaMoli/AmoliCloud/blob/master/LICENSE)
 
