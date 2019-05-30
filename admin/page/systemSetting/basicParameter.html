@@ -24,6 +24,50 @@
 				</div>
 			</div>
 			<div class="layui-form-item">
+				<label class="layui-form-label">存储模式</label>
+				<div class="layui-input-block">
+					<input type="radio" name="type" value="local" title="本地存储">
+					<input type="radio" name="type" value="oss" title="OSS存储">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<fieldset class="layui-elem-field">
+					<legend>本地存储 - 配置</legend>
+					<div class="layui-field-box LocalConfig">
+						<label class="layui-form-label">目录路径</label>
+						<div class="layui-input-block">
+							<input type="text" value="" placeholder="请输入目录路径 例如:file/ 默认为根目录" class="layui-input localhost">
+						</div>
+					</div>
+					<div class="layui-field-box OssConfig layui-hide">
+						<label class="layui-form-label">Bucket</label>
+						<div class="layui-input-block">
+							<input type="text" value="" placeholder="请输入 Bucket" class="layui-input bucket">
+						</div><br>
+						<label class="layui-form-label">Endpoint</label>
+						<div class="layui-input-block">
+							<input type="text" value="" placeholder="请输入 Endpoint 请按照格式填写" class="layui-input endpoint">
+						</div><br>
+						<label class="layui-form-label">格式：</label>
+						<div class="layui-input-block">
+							<span class="layui-form-item" style="color: #FF5722;">http(s)://+EndPoint(地域节点)如果网站采用https协议，请用：https://+EndPoint</span>
+						</div><br>
+						<label class="layui-form-label">AccessKeyId</label>
+						<div class="layui-input-block">
+							<input type="text" value="" placeholder="请输入 AccessKeyId" class="layui-input accessKeyId">
+						</div><br>
+						<label class="layui-form-label">AccessKeySecret</label>
+						<div class="layui-input-block">
+							<input type="text" value="" placeholder="请输入 AccessKeySecret" class="layui-input accessKeySecret">
+						</div><br>
+						<label class="layui-form-label">自定义域名</label>
+						<div class="layui-input-block">
+							<input type="text" value="" placeholder="OSS没绑定自定义域名请留空 不加http://" class="layui-input ossdomain">
+						</div>
+					</div>
+				</fieldset>
+			</div>
+			<div class="layui-form-item">
 				<label class="layui-form-label">前台密码</label>
 				<div class="layui-input-block">
 					<input type="text" value="" placeholder="请输入前台登录密码" class="layui-input indexpass">

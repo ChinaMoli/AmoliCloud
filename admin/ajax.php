@@ -184,38 +184,20 @@ switch($act){
         */
         break;
     case 'systemParameter': // 系统基本参数
-        $result=[
-            'name' => $C->get('name'),
-            'user' => $C->get('user'),
-            'indexpass' => $C->get('indexpass'),
-            'record' => $C->get('record'),
-            'version' => $C->get('version'),
-            'bucket' => $C->get('bucket'),
-            'endpoint' => $C->get('endpoint'),
-            'accessKeyId' => $C->get('accessKeyId'),
-            'accessKeySecret' => $C->get('accessKeySecret'),
-            'ossdomain' => $C->get('ossdomain'),
+        $result=$C->get()+[
             'server' => PHP_OS,
             'host' => $_SERVER['HTTP_HOST'],
             'root' => $_SERVER['DOCUMENT_ROOT'],
             'server_software' => $_SERVER['SERVER_SOFTWARE'],
             'php_version' => PHP_VERSION,
-            'upload_max' => get_cfg_var("upload_max_filesize"),
-            'loginTime' => $C->get('loginTime')
+            'upload_max' => get_cfg_var("file_uploads") ? get_cfg_var("upload_max_filesize") : '空间不允许上传'
         ];
         break;
     case 'webconfig': // 网站配置
         $C->set('name',$_POST['name']);
-        $C->set('indexpass',$_POST['indexpass']);
-        $C->set('record',$_POST['record']);
-        $msg=$C->save();
-        if($msg){
-            $result=['msg' => '修改成功！'];
-        }else{
-            $result=['msg' => $msg];
-        }
-        break;
-    case 'ossconfig': // OSS配置
+        $type=$_POST['type'];
+        $C->set('type',$type);
+        $C->set('localhost',$_POST['localhost']);
         $bucket = $_POST['bucket'];
         $endpoint = $_POST['endpoint'];
         $accessKeyId = $_POST['accessKeyId'];
@@ -225,17 +207,20 @@ switch($act){
         $C->set('accessKeyId',$accessKeyId);
         $C->set('accessKeySecret',$accessKeySecret);
         $C->set('ossdomain',$_POST['ossdomain']);
+        $C->set('indexpass',$_POST['indexpass']);
+        $C->set('record',$_POST['record']);
         $msg=$C->save();
-        // 设置跨域资源共享规则
-        $corsConfig = new CorsConfig();
-        $rule = new CorsRule();
-        $rule->addAllowedHeader("*");
-        $rule->addAllowedOrigin("*");
-        $rule->addAllowedMethod("POST");
-        $rule->setMaxAgeSeconds(0);
-        $corsConfig->addRule($rule);
-        $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
-        $ossClient->putBucketCors($bucket, $corsConfig);
+        if($type=="oss"){// 设置跨域资源共享规则
+            $corsConfig = new CorsConfig();
+            $rule = new CorsRule();
+            $rule->addAllowedHeader("*");
+            $rule->addAllowedOrigin("*");
+            $rule->addAllowedMethod("POST");
+            $rule->setMaxAgeSeconds(0);
+            $corsConfig->addRule($rule);
+            $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
+            $ossClient->putBucketCors($bucket, $corsConfig);
+        }
         if($msg){
             $result=['msg' => '修改成功！'];
         }else{
