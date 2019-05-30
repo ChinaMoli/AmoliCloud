@@ -1,4 +1,4 @@
-var user = "";
+var user;
 layui.use(['form', 'element', 'layer', 'jquery'], function () {
     $ = layui.jquery;
     //icon动画
@@ -17,9 +17,10 @@ layui.use(['form', 'element', 'layer', 'jquery'], function () {
         type: "get",
         dataType: "json",
         success: function (data) {
-            var item = data.data;
+            var item = data.data,
+                this_version = item.version;
             user = item.user;
-            $(".version").text(item.version);// 当前版本
+            $(".version").text(this_version);// 当前版本
             $(".php_version").text(item.php_version);// PHP版本
             $(".server").text(item.server);// 服务器环境
             $(".host").text(item.host);// 服务器 (IP/端口)
@@ -27,6 +28,17 @@ layui.use(['form', 'element', 'layer', 'jquery'], function () {
             $(".upload_max").text(item.upload_max);// 允许最大上传文件
             $(".root").text(item.root);// 安装目录
             $(".loginTime").text(item.loginTime);// 上次登录时间
+            // 检测更新
+            $.get('https://pan.amoli.co/AmoliCloud.php?act=version', function (data) {
+                var new_version = data.version;
+                if (new_version != this_version) {
+                    $("#new_version,#new").css('color', '#FF5722');
+                    $("#new").text('有新版本可用');
+                    $("#new_version").text('点击查看更新内容');
+                } else {
+                    $("#new_version").text(new_version);
+                }
+            })
         }
     })
 })

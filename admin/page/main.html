@@ -25,8 +25,8 @@
 					<i class="layui-anim layui-icon layui-icon-about"></i>
 				</div>
 				<div class="panel_word">
-					<span>最新版本</span>
-					<cite>4.0.0</cite>
+					<span id="new">最新版本</span>
+					<cite id="new_version"></cite>
 				</div>
 			</a>
 		</div>
@@ -201,7 +201,8 @@
 	</div>
 
 	<script type="text/javascript" src="../layui/layui.js"></script>
-	<script type="text/javascript" src="../js/main.js"></script>
+	<!--<script type="text/javascript" src="../js/main.js"></script>-->
+	<script>document.write("<script type='text/javascript' src='../js/main.js?v=" + Date.now() + "'><\/script>");</script>
 </body>
 
 </html>
