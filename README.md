@@ -1,11 +1,12 @@
 <p align="center">
-<img src="https://github.com/ChinaMoli/AmoliCloud/blob/master/admin/images/Amoli.png" alt="AmoliCloud">
+<img src="https://s2.ax1x.com/2019/05/30/VKshgs.png" alt="AmoliCloud">
 </p>
 <h1 align="center">AmoliCloud</h1>
 
 > 😊私有云存储系统，支持本地存储以及阿里云OSS，提供简单的文件列表、上传下载、管理等功能。
 
 [![npm](https://img.shields.io/npm/l/dplayer.svg?style=flat-square)](https://github.com/ChinaMoli/AmoliCloud/blob/master/LICENSE)
+[![Travis](https://img.shields.io/travis/MoePlayer/DPlayer.svg?style=flat-square)](https://travis-ci.org/ChinaMoli/AmoliCloud)
 
 ## 预览/Demo
 *  <https://new.amoli.co>
