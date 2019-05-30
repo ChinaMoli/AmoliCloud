@@ -10,5 +10,7 @@
     "accessKeySecret": "",
     "record": "",
     "indexpass": "",
-    "ossdomain": ""
+    "ossdomain": "",
+    "type": "oss",
+    "localhost": ""
 }
