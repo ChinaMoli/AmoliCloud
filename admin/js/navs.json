@@ -13,12 +13,6 @@
 			"icon": "&#xe631;",
 			"href": "page/systemSetting/basicParameter.html",
 			"spread": false
-		},
-		{
-			"title": "OSS设置",
-			"icon": "&#xe631;",
-			"href": "page/oss/setConfig.html",
-			"spread": false
 		}
 	],
 	"seraphApi": [
