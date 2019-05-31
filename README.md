@@ -22,6 +22,9 @@ Releases：<https://github.com/ChinaMoli/AmoliCloud/releases>，或使用git：
 ~~~
 * 更新：
 Releases：<https://github.com/ChinaMoli/AmoliCloud/releases>，或使用git
+~~~
+# git clone https://github.com/ChinaMoli/AmoliCloud.git
+~~~
 * 配置OSS服务：
 1. 开通OSS服务、新建存储空间、上传文件：[OSS新手入门](https://promotion.aliyun.com/ntms/ossedu2.html)
 2. 了解基本的OSS属性信息，得到Endpoint
