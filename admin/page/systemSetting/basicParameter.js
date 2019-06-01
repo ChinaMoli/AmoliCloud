@@ -63,7 +63,7 @@ layui.use(['form', 'layer', 'jquery'], function () {
 	form.on("radio()", function (data) {
 		RadioOn(data.value);
 	})
-	function RadioOn(type) {
+	function RadioOn(type = 'local') {
 		var radios = $('input[type="radio"][name="type"]');
 		if (type == "local") {
 			$("legend").text('本地存储 - 配置');
