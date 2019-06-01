@@ -1,5 +1,5 @@
 <?php exit;?>{
-    "name": "",
+    "name": "ss",
     "version": "",
     "loginTime": "",
     "user": "",
