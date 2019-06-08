@@ -2,124 +2,123 @@
 error_reporting(0); // 关闭错误提示
 date_default_timezone_set('Asia/Shanghai');
 header('Content-Type: text/html; charset=UTF-8');
-require_once __DIR__ . '/app/class/Config.class.php';
+require_once __DIR__ . '/app/class/Amoli.class.php';
 require_once __DIR__ . '/app/sdk/autoload.php';
 $act = $_GET['act'];
 $dir = $_GET['dir'];
 $C = new Config('Config');
+$Amoli = new Amoli();
 $bucket = $C->get('bucket');
 $endpoint = $C->get('endpoint');
 $accessKeyId = $C->get('accessKeyId');
 $accessKeySecret = $C->get('accessKeySecret');
 $indexpass = md5($C->get('indexpass'));
 $Cookie = $_COOKIE['Amoli_index'];
-if ($Cookie == $indexpass || $C->get('indexpass') == '') {
-    $log = true;
-} else {
-    $log = false;
-}
+($Cookie == $indexpass || $C->get('indexpass') == '') ? $log = true : $log = false;
 use OSS\OssClient;
-use OSS\CoreOss\Exception;
+use OSS\Core\OssException;
+
 switch ($act) {
     case 'getConfig': // 获取配置
-        $result = ['code' => '0', 'name' => $C->get('name') , 'record' => $C->get('record') , 'log' => $log];
-        echo json_encode($result);
+        file_exists('install/install.lock') ? $install = true : $install = false;
+        $result = ['code' => '0', 'name' => $C->get('name'), 'record' => $C->get('record'), 'log' => $log, 'install' => $install];
         break;
 
     case 'getList': // 加载目录
         if ($log) {
-            // 单位换算
-            function getFilesize($num) {
-                $p = 0;
-                $format = 'B';
-                if ($num > 0 && $num < 1024) {
-                    $p = 0;
-                    return number_format($num) . ' ' . $format;
-                }
-                if ($num >= 1024 && $num < pow(1024, 2)) {
-                    $p = 1;
-                    $format = 'KB';
-                }
-                if ($num >= pow(1024, 2) && $num < pow(1024, 3)) {
-                    $p = 2;
-                    $format = 'MB';
-                }
-                if ($num >= pow(1024, 3) && $num < pow(1024, 4)) {
-                    $p = 3;
-                    $format = 'GB';
-                }
-                $num/= pow(1024, $p);
-                return number_format($num, 2) . ' ' . $format;
-            }
-            // 列出文件及文件夹
-            try {
-                $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
-                $options = array(
-                    'prefix' => $dir,
-                    'max-keys' => '1000'
-                );
-                $listObjectInfo = $ossClient->listObjects($bucket, $options);
-                $prefixlist = $listObjectInfo->getPrefixList();
-                $objectList = $listObjectInfo->getObjectList();
-                if (!empty($prefixlist)) {
-                    foreach ($prefixlist as $prefixInfo) {
-                        $Wjj_Name = str_replace($dir, '', $prefixInfo->getPrefix()); //替换掉多于的文件夹名 只剩当前文件夹名
-                        $Wjj_Name = str_replace("/", '', $Wjj_Name); // 去掉当前文件夹名的“/”
-                        $list[] = ['type' => 'wjj', 'name' => $Wjj_Name, 'size' => '', 'time' => ''];
-                    }
-                }
-                if (!empty($objectList)) {
-                    foreach ($objectList as $objectInfo) {
-                        $Wj_Name = str_replace($dir, '', $objectInfo->getKey());
-                        if ($Wj_Name != '') {
-                            $Wj_Size = getFilesize($objectInfo->getSize());
-                            $Wj_Time = date("Y-m-d H:i", strtotime($objectInfo->getLastModified()));
-                            //获取文件后戳名
-                            $icon = strrpos($Wj_Name, '.') + 1; // +1 为了去掉 “.”
-                            $icon = substr($Wj_Name, $icon);
-                            $icon = strtolower($icon); // 全部换成小写，避免前端出错
-                            $list[] = ['type' => $icon, 'name' => $Wj_Name, 'size' => $Wj_Size, 'time' => $Wj_Time];
+            if ($C->get('type') == 'oss') {
+                //列出OSS文件及文件夹
+                try {
+                    $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
+                    $options = array(
+                        'prefix' => $dir,
+                        'max-keys' => '1000'
+                    );
+                    $listObjectInfo = $ossClient->listObjects($bucket, $options);
+                    $prefixlist = $listObjectInfo->getPrefixList();
+                    $objectList = $listObjectInfo->getObjectList();
+                    if (!empty($prefixlist)) {
+                        foreach ($prefixlist as $prefixInfo) {
+                            $Wjj_Name = str_replace($dir, '', $prefixInfo->getPrefix()); //替换掉多于的文件夹名 只剩当前文件夹名
+                            $Wjj_Name = str_replace("/", '', $Wjj_Name); // 去掉当前文件夹名的“/”
+                            $list[] = ['type' => 'wjj', 'name' => $Wjj_Name, 'size' => '', 'time' => ''];
                         }
                     }
+                    if (!empty($objectList)) {
+                        foreach ($objectList as $objectInfo) {
+                            $Wj_Name = str_replace($dir, '', $objectInfo->getKey());
+                            if ($Wj_Name != '') {
+                                $Wj_Size = $Amoli->getFilesize($objectInfo->getSize());
+                                $Wj_Time = date("Y-m-d H:i", strtotime($objectInfo->getLastModified()));
+                                $list[] = ['type' => $Amoli->getStamp($Wj_Name), 'name' => $Wj_Name, 'size' => $Wj_Size, 'time' => $Wj_Time];
+                            }
+                        }
+                    }
+                    // 文件夹下没有文件输出提示
+                    if (empty($list)) {
+                        $list[] = ['type' => 'null', 'name' => '提示：当前文件夹下没有文件', 'size' => '', 'time' => ''];
+                    }
+                } catch (OssException $e) {
+                    echo $e->getMessage();
                 }
-                // 文件夹下没有文件输出提示
+            } else {
+                $folder = [];
+                $file2 = [];
+                $dir = $_SERVER['DOCUMENT_ROOT'] . '/' . $Amoli->getEncoding($C->get('localhost') . $dir,true);
+                $list = scandir($dir);
+                foreach ($list as $file) {
+                    $file_location = $dir . $file;
+                    $filesize = filesize($file_location);
+                    $filestime = date("Y-m-d H:i", filemtime($file_location));
+                    $file = $Amoli->getEncoding($file);
+                    if (is_dir($file_location) && $file != '.' && $file != '..') {
+                        $folder[] = [
+                            'type' => 'wjj',
+                            'name' => $file,
+                            'size' => '',
+                            'time' => ''
+                        ];
+                    } elseif ($file != '.' && $file != '..') {
+                        $file2[] = [
+                            'type' => $Amoli->getStamp($file),
+                            'name' => $file,
+                            'size' => $Amoli->getFilesize($filesize),
+                            'time' => $filestime
+                        ];
+                    }
+                }
+                $list = array_merge($folder, $file2);
                 if (empty($list)) {
-                    $list[] = ['type' => "null", 'name' => "提示：当前文件夹下没有文件", 'size' => "", 'time' => ""];
-                }
-                $result = ['code' => '0', 'msg' => '获取成功', 'data' => $list];
-                echo json_encode($result);
+                    $list[] = ['type' => 'null', 'name' => '提示：当前文件夹下没有文件', 'size' => '', 'time' => ''];
+                };
             }
-            catch(OssException $e) {
-                echo $e->getMessage();
-            }
+            $result = ['code' => '0', 'msg' => '获取成功', 'data' => $list];
         }
         break;
-
     case 'getUrl': // 获取文件下载Url
         preg_match('/dir=(.*)/i', $_SERVER["QUERY_STRING"], $dir); // 用正则提取 $_SERVER["QUERY_STRING"] 里的 $dir=”
         $dir = str_replace('+', '%2B', $dir[1]); // 替换$dir[1]里面的 “+”，后赋值给 $dir
         $dir = UrlDecode($dir); // 将得到的$dir进行URL解码
-        $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
-        $options = array(
-            'response-content-type' => 'application/octet-stream'
-        );
-        try {
-            $signedUrl = $ossClient->signUrl($bucket, $dir, 120, 'GET', $options);
-            $ossdomain = $C->get('ossdomain');
-            // 自定义域名
-            if ($ossdomain) {
-                if (strstr($signedUrl, "http://")) {
-                    $http = 'http://';
-                } else {
-                    $http = 'https://';
+        if ($C->get('type') == 'oss') {
+            $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
+            $options = array('response-content-type' => 'application/octet-stream');
+            try {
+                $signedUrl = $ossClient->signUrl($bucket, $dir, 120, 'GET', $options);
+                $ossdomain = $C->get('ossdomain');
+                // 自定义域名
+                if ($ossdomain) {
+                    strstr($signedUrl, "http://") ? $protocol = 'http://' : $protocol = 'https://';
+                    $url = str_replace($protocol, $protocol . $bucket . '.', $endpoint);
+                    $signedUrl = str_replace($url, $protocol . $ossdomain, $signedUrl);
                 }
-                $url = str_replace($http, $http . $bucket . '.', $endpoint);
-                $signedUrl = str_replace($url, $http . $ossdomain, $signedUrl);
+                $result = ['code' => '0', 'msg' => true, 'url' => $signedUrl];
+            } catch (OssException $e) {
+                $result = ['code' => '-1', 'msg' => $e->getMessage()];
             }
-            echo $signedUrl;
-        }
-        catch(OssException $e) {
-            echo $e->getMessage();
+        } else {
+            $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+            $url = $protocol . $_SERVER['SERVER_NAME'] . ':' . $_SERVER["SERVER_PORT"] . '/' . $C->get('localhost') . $dir;
+            $result = ['code' => '0', 'msg' => true, 'url' => $url];
         }
         break;
 
@@ -131,7 +130,6 @@ switch ($act) {
         } else {
             $result = ['msg' => false];
         }
-        echo json_encode($result);
         break;
 
     case 'logout': // 退出登录
@@ -142,3 +140,4 @@ switch ($act) {
     default:
         echo 'No Act!';
 }
+echo json_encode($result);

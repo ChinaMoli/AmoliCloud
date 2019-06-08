@@ -127,21 +127,21 @@ switch ($step) {
             <form class="layui-form layui-form-pane" action="?step=4" method="post">
                 <div class="layui-form-item">
                     <label class="layui-form-label">网站名称</label>
-                    <div class="layui-input-inline w200">
+                    <div class="layui-input-inline">
                         <input type="text" class="layui-input" name="name" lay-verify="required" value="Amoli云盘">
                     </div>
-                    <div class="layui-form-mid layui-word-aux">您的网站名称 *必填</div>
+                    <div class="layui-form-mid" style="color: #FF5722;">您的网站名称 *必填</div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">前台密码</label>
-                    <div class="layui-input-inline w200">
-                        <input type="text" class="layui-input" name="indexpass" lay-verify="required">
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" name="indexpass">
                     </div>
-                    <div class="layui-form-mid layui-word-aux">前台访问密码 *必填</div>
+                    <div class="layui-form-mid layui-word-aux">留空即为关闭密码</div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">网站备案号</label>
-                    <div class="layui-input-inline w200">
+                    <div class="layui-input-inline">
                         <input type="text" class="layui-input" name="record" lay-verify="required">
                     </div>
                     <div class="layui-form-mid layui-word-aux">网站备案号</div>
@@ -151,17 +151,17 @@ switch ($step) {
                 </fieldset>
                 <div class="layui-form-item">
                     <label class="layui-form-label">管理员账号</label>
-                    <div class="layui-input-inline w200">
+                    <div class="layui-input-inline">
                         <input type="text" class="layui-input" name="user" lay-verify="required">
                     </div>
-                    <div class="layui-form-mid layui-word-aux">管理员账号最少5位 *必填</div>
+                    <div class="layui-form-mid" style="color: #FF5722;">管理员账号最少5位 *必填</div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">管理员密码</label>
-                    <div class="layui-input-inline w200">
+                    <div class="layui-input-inline">
                         <input type="password" class="layui-input" name="pass" lay-verify="required">
                     </div>
-                    <div class="layui-form-mid layui-word-aux">管理员密码最少6位 *必填</div>
+                    <div class="layui-form-mid" style="color: #FF5722;">管理员密码最少6位 *必填</div>
                 </div>
                 <div class="step-btns">
                     <a href="?step=2" class="layui-btn layui-btn-primary layui-btn-big fl">返回上一步</a>
@@ -177,8 +177,8 @@ switch ($step) {
         $record = $_POST['record'];
         $user = $_POST['user'];
         $pass = MD5($_POST['pass'].'$$Www.Amoli.Co$$');
-        if($name and $indexpass and $user and $pass){
-            require_once '../app/class/Config.class.php';
+        if($name && $user && $pass){
+            require_once '../app/class/Amoli.class.php';
             $C = new Config('../Config');
             // 存储数据
             $C->set('name',$name);// 网站名称
@@ -186,16 +186,15 @@ switch ($step) {
             $C->set('record',$record);// 网站备案号
             $C->set('user',$user);// 后台账户
             $C->set('pass',$pass);// 后台密码
-            $C->set('version','4.0.0');// 程序版本号
+            $C->set('version','4.1.0');// 程序版本号
             $msg = $C->save();
             if($msg){
-                file_put_contents("install.lock",'www.amoli.co');
-                $result = '安装完成!';
+                file_put_contents("install.lock",'www.amoli.co') ? $result = '安装完成!' : $result = 'install.lock写入失败!';
             }else{
                 $result = $msg;
             }
         }else{
-            $result = '网站名称、前台密码、管理员账号、管理员密码不允许为空！';
+            $result = '网站名称、管理员账号、管理员密码不允许为空！';
         }
         echo '
             <style type="text/css">
@@ -209,7 +208,7 @@ switch ($step) {
                 <h1>'.$result.'</h1>
                 <div class="step-btns">
                 <a href="/" class="layui-btn layui-btn-primary layui-btn-big fl">返回首页</a>
-                <a href="../admin/login.html" class="layui-btn layui-btn-big layui-btn-normal fr">前往后台</a>
+                <a href="../admin/index.html" class="layui-btn layui-btn-big layui-btn-normal fr">前往后台</a>
                 </div>
             </div>
             ';

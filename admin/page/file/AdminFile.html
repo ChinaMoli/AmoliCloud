@@ -3,7 +3,7 @@
 
 <head>
 	<meta charset="utf-8">
-	<title>管理OSS - Amoli私有云</title>
+	<title>文件管理 - Amoli私有云</title>
 	<meta name="renderer" content="webkit">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -12,7 +12,10 @@
 	<meta name="format-detection" content="telephone=no">
 	<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
 	<link rel="stylesheet" href="../../css/public.css" media="all" />
-	<link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css">
+	<script src="https://at.alicdn.com/t/font_1186130_j294f0s3a38.js"></script>
+	<style type="text/css">
+		.ico{width:18px}.size{width:100px}.time{width:140px}.icon{width:1em;height:1em;vertical-align:-0.15em;fill:currentColor;overflow:hidden;}
+	</style>	
 </head>
 
 <body class="childrenBody">
@@ -25,14 +28,8 @@
 			<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
 		{{#  } }}
 	</script>
-	<!--工具栏-->
-	<script type="text/html" id="Headbar">
-		<div class="layui-btn-container">
-		  <button class="layui-btn layui-btn-sm layui-bg-red" lay-event="Upload">上传文件</button>
-		</div>
-	</script>
 	<script type="text/javascript" src="../../layui/layui.js"></script>
-	<script type="text/javascript" src="AdminOss.js"></script>
+	<script type="text/javascript" src="AdminFile.js"></script>
 </body>
 
 </html>

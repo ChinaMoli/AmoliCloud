@@ -1,6 +1,6 @@
 var user;
 layui.use(['form', 'element', 'layer', 'jquery'], function () {
-    $ = layui.jquery;
+    var $ = layui.jquery;
     //icon动画
     $(".panel a").hover(function () {
         $(this).find(".layui-anim").addClass("layui-anim-scaleSpring");
@@ -27,18 +27,21 @@ layui.use(['form', 'element', 'layer', 'jquery'], function () {
             $(".upload_max").text(item.upload_max);// 允许最大上传文件
             $(".root").text(item.root);// 安装目录
             $(".loginTime").text(item.loginTime);// 上次登录时间
-        }
-    })
-
-    // 检测更新
-    $.get('https://pan.amoli.co/AmoliCloud.php?act=version', function (data) {
-        var new_version = data.version;
-        if (new_version != $(".version").text()) {
-            $("#new_version,#new").css('color', '#FF5722');
-            $("#new").text('更新提示');
-            $("#new_version").text('有新版本可以更新');
-        } else {
-            $("#new_version").text(new_version);
+            // 检测更新
+            $.ajax({
+                url: 'https://www.amoli.co/log/AmoliCloud.php?act=version',
+                dataType: "json",
+                success: function (data) {
+                    var new_version = data.version;
+                    if (new_version != item.version) {
+                        $("#new_version,#new").css('color', '#FF5722');
+                        $("#new").text('更新提示');
+                        $("#new_version").text('有新版本可以更新');
+                    } else {
+                        $("#new_version").text(new_version);
+                    }
+                }
+            })
         }
     })
 })

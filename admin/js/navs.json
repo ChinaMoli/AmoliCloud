@@ -1,9 +1,15 @@
 {
 	"contentManagement": [
 		{
-			"title": "管理OSS",
+			"title": "网站设置",
+			"icon": "&#xe631;",
+			"href": "page/systemSetting/basicParameter.html",
+			"spread": false
+		},
+		{
+			"title": "文件管理",
 			"icon": "&#xe7ae;",
-			"href": "page/oss/AdminOss.html",
+			"href": "page/file/AdminFile.html",
 			"spread": false
 		}
 	],

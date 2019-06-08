@@ -4,6 +4,16 @@ $(function () {
         url: 'Ajax.php?act=getConfig',
         dataType: "json",
         success: function (data) {
+            // 检测是否安装
+            if (!data.install) {
+                layer.open({
+                    title: '提示',
+                    content: '你还没有安装程序，点击确定安装',
+                    icon: 2,
+                    yes: function () { window.location.href = 'install/index.php'; }
+                })
+                return;
+            }
             $("title,.navbar-brand").prepend(data.name);// 配置前端信息
             $("#record").text(data.record);
             if (data.log) {
@@ -13,7 +23,7 @@ $(function () {
                     type: 1,
                     title: '请输入查看密码',
                     area: ['350px', 'auto'],
-                    content: '<div class="container text-right">' + '<br><div class="input-group mb-3">' + '<div class="input-group-prepend">' + '<span class="input-group-text">密码：</span>' + '</div>' + '<input type="text" class="form-control" id="indexpass">' + '</div>' + '<button type="submit" class="btn btn-primary" onclick="login()">确认</button>' + '<div><p></p></div>' + '</div>'
+                    content: '<div class="container text-right"><br><form onsubmit="return login();"><div class="input-group mb-3"><div class="input-group-prepend"><span class="input-group-text">密码：</span></div><input type="text" class="form-control" id="indexpass"></div><input type="submit" class="btn btn-primary" value="确认"><div><p></p></div></form></div>'
                 });
             }
         }
@@ -96,8 +106,6 @@ function getList(ojb, ListNav, thats) {
                 if (item[i].type == "wjj") {
                     var name = '<a href="javascript:;" onclick="getList(this,\'' + dir + '\')">' + item[i].name + '</a>';
                 } else {
-
-
                     var name = '<a href="javascript:;" onclick="Preview(\'' + item[i].type + '\',\'' + item[i].name + '\', \'' + dir + item[i].name + '\')">' + item[i].name + '</a>';
                 }
                 str += '<tr><td><svg class="icon" aria-hidden="true"><use xlink:href="#icon-' + getType(item[i].type) + '"></use></svg></td><td>' + name + '</td><td class ="text-right">' + item[i].size + '</td><td class ="text-center">' + item[i].time + '</td></tr>';
@@ -120,8 +128,13 @@ function getList(ojb, ListNav, thats) {
 function DownFlie(dir) {
     $.ajax({
         url: 'Ajax.php?act=getUrl&dir=' + dir,
+        dataType: "json",
         success: function (data) {
-            window.open(data);
+            if (data.msg) {
+                window.location.href = data.url;
+            } else {
+                layer.alert('错误代码：<br>' + data.msg, { icon: 2 });
+            }
         }
     })
 }
@@ -129,16 +142,18 @@ function DownFlie(dir) {
 function Preview(type, title, dir) {
     $.ajax({
         url: 'Ajax.php?act=getUrl&dir=' + dir,
+        dataType: "json",
         success: function (data) {
+            var result;
             switch (type) {
                 case "mp3":
-                    result = '<audio width="100%" height="100%" controls><source src="' + data + '" type="audio/mpeg">您的浏览器不支持该音频格式。</audio>';
+                    result = '<audio width="100%" height="100%" controls><source src="' + data.url + '" type="audio/mpeg">您的浏览器不支持该音频格式。</audio>';
                     break;
                 case "mp4":
-                    result = '<video width="100%" height="100%" controls><source src="' + data + '" type="video/mp4">您的浏览器不支持该视频格式。</video>';
+                    result = '<video width="100%" height="100%" controls><source src="' + data.url + '" type="video/mp4">您的浏览器不支持该视频格式。</video>';
                     break;
                 case "jpg": case "png": case "bmp": case "gif": case "ico":
-                    result = '<img src="' + data + '" class="img-fluid">';
+                    result = '<img src="' + data.url + '" class="img-fluid">';
                     break;
                 default:
                     DownFlie(dir);
@@ -158,7 +173,8 @@ function Preview(type, title, dir) {
                     + '</div>'
                     + '<br>'
                     + '<div class="text-right">'
-                    + '<button type="button" class="btn btn-outline-secondary btn-sm" onclick="DownFlie(\'' + dir + '\')"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-down"></use></svg>下载</button>'
+                    + '<button type="button" class="btn btn-outline-secondary btn-sm"><a class="dropdown-item" target="_blank" href="' + data.url + '"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-down"></use></svg>下载</a></button>'
+                    + '<p> </p>'
                     + '</div>'
                     + '</div>'
             });
@@ -167,8 +183,8 @@ function Preview(type, title, dir) {
 }
 // 前台登录
 function login() {
-    var index = layer.msg('登录验证中，请稍候', { icon: 16, time: false, shade: 0.8 });
-    var indexpass = $('#indexpass').val();
+    var index = layer.msg('登录验证中，请稍候', { icon: 16, time: false, shade: 0.8 }),
+        indexpass = $('#indexpass').val();
     $.ajax({
         url: 'Ajax.php?act=login',
         type: "post",
@@ -182,5 +198,6 @@ function login() {
             }
         }
     })
+    return false;
 }
 console.log('%c Amoli私有云 - 帮助您快速搭建私有云盘系统 官网地址：https://www.amoli.co', 'font-size:20px;');

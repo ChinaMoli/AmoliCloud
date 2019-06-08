@@ -33,15 +33,26 @@ Releases：<https://github.com/ChinaMoli/AmoliCloud/releases>，或使用git
 
 ## 更新日志/ChangeLog
 ```
-version 4.0.1 2019-05-26
+version 4.1.0 2019-06-09
 
-    [新增] 前端验证开关(前端密码留空即为不开启)
+    [新增] 自动检测更新，提示更新
+    [新增] 本地存储，没有OSS也可以使用
+    [新增] 首页验证开关(留空即为关闭)
+    [新增] 首页后台系统基本参数
+    [新增] 未知Bug无数
+    [优化] 自动提示安装，避免误操作
+    [优化] 增加多处备注，避免误操作
+    [优化] 将常用功能放在后台首页，方便使用
+    [优化] 登录步骤，加入简单的验证机制
+    [优化] OSS设置和网站设置合并为一个页面
+    [优化] 多处细节，提升访问速度
+    [修复] 修复后台已知Bug
 ```
 更多：[CHANGELOG.md](https://github.com/ChinaMoli/AmoliCloud/blob/master/CHANGELOG.md)
 
 ## 后续可能的改动/Preview
 ```
-增加本地存储
+增加七牛云，腾讯云，又拍云的主流存储
 ```
 
 ## 开源协议/License

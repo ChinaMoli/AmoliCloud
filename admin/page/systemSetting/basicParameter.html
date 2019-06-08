@@ -34,44 +34,71 @@
 				<fieldset class="layui-elem-field">
 					<legend>本地存储 - 配置</legend>
 					<div class="layui-field-box LocalConfig">
-						<label class="layui-form-label">目录路径</label>
-						<div class="layui-input-block">
-							<input type="text" value="" placeholder="请输入目录路径 例如:file/ 默认为根目录" class="layui-input localhost">
+						<div class="layui-form-item">
+							<label class="layui-form-label">格式：</label>
+							<div class="layui-input-block">
+								<span class="layui-form-item" style="color: #FF5722;">目录名称，从根目录开始，以"/"结尾例如down/，text/img/<br>留空即为根目录</span>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">目录路径</label>
+							<div class="layui-input-block">
+								<input type="text" value="" placeholder="请输入目录路径 请按照格式填写" class="layui-input localhost">
+							</div>
 						</div>
 					</div>
 					<div class="layui-field-box OssConfig layui-hide">
-						<label class="layui-form-label">Bucket</label>
-						<div class="layui-input-block">
-							<input type="text" value="" placeholder="请输入 Bucket" class="layui-input bucket">
-						</div><br>
-						<label class="layui-form-label">Endpoint</label>
-						<div class="layui-input-block">
-							<input type="text" value="" placeholder="请输入 Endpoint 请按照格式填写" class="layui-input endpoint">
-						</div><br>
-						<label class="layui-form-label">格式：</label>
-						<div class="layui-input-block">
-							<span class="layui-form-item" style="color: #FF5722;">http(s)://+EndPoint(地域节点)如果网站采用https协议，请用：https://+EndPoint</span>
-						</div><br>
-						<label class="layui-form-label">AccessKeyId</label>
-						<div class="layui-input-block">
-							<input type="text" value="" placeholder="请输入 AccessKeyId" class="layui-input accessKeyId">
-						</div><br>
-						<label class="layui-form-label">AccessKeySecret</label>
-						<div class="layui-input-block">
-							<input type="text" value="" placeholder="请输入 AccessKeySecret" class="layui-input accessKeySecret">
-						</div><br>
-						<label class="layui-form-label">自定义域名</label>
-						<div class="layui-input-block">
-							<input type="text" value="" placeholder="OSS没绑定自定义域名请留空 不加http://" class="layui-input ossdomain">
+						<div class="layui-form-item">
+							<label class="layui-form-label">Bucket</label>
+							<div class="layui-input-inline">
+								<input type="text" value="" placeholder="请输入 Bucket" class="layui-input bucket">
+							</div>
+							<div class="layui-form-mid" style="color: #FF5722;">OSS配置教程：&nbsp;<a target="_blank" href="https://wums.cn/archives/AMoliCloud-deploy.html">点此查看</a></div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">Endpoint</label>
+							<div class="layui-input-block">
+								<input type="text" value="" placeholder="请输入 Endpoint 请按照格式填写"
+									class="layui-input endpoint">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">格式：</label>
+							<div class="layui-input-block">
+								<span class="layui-form-item"
+									style="color: #FF5722;">http(s)://+EndPoint(地域节点)如果网站采用https协议，请用：https://+EndPoint</span>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">AccessKeyId</label>
+							<div class="layui-input-block">
+								<input type="text" value="" placeholder="请输入 AccessKeyId"
+									class="layui-input accessKeyId">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">AccessKeySecret</label>
+							<div class="layui-input-block">
+								<input type="text" value="" placeholder="请输入 AccessKeySecret"
+									class="layui-input accessKeySecret">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">自定义域名</label>
+							<div class="layui-input-block">
+								<input type="text" value="" placeholder="OSS没绑定自定义域名请留空 不加http://"
+									class="layui-input ossdomain">
+							</div>
 						</div>
 					</div>
 				</fieldset>
 			</div>
 			<div class="layui-form-item">
 				<label class="layui-form-label">前台密码</label>
-				<div class="layui-input-block">
+				<div class="layui-input-inline">
 					<input type="text" value="" placeholder="请输入前台登录密码" class="layui-input indexpass">
 				</div>
+				<div class="layui-form-mid" style="color: #FF5722;">留空即为关闭验证</div>
 			</div>
 			<div class="layui-form-item">
 				<label class="layui-form-label">网站备案号</label>
