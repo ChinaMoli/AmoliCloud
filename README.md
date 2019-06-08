@@ -9,8 +9,8 @@
 [![Travis](https://img.shields.io/travis/MoePlayer/DPlayer.svg?style=flat-square)](https://travis-ci.org/ChinaMoli/AmoliCloud)
 
 ## 预览/Demo
-*  <https://new.amoli.co>
-* ![](https://i.loli.net/2019/05/26/5ce9b3ceca63145762.png)
+*  <https://demo.amoli.co>
+* ![](https://s2.ax1x.com/2019/06/09/VDj48f.jpg)
 
 ## 部署/Build
 * 环境：
