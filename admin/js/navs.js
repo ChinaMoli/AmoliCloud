@@ -27,6 +27,12 @@
 			"icon": "icon-mokuai",
 			"href": "https://wums.cn/archives/AMoliCloud-deploy.html",
 			"spread": false
+		},
+		{
+			"title": "COS配置教程",
+			"icon": "icon-mokuai",
+			"href": "https://wums.cn/archives/AmoliCloud-CosConfig.html",
+			"spread": false
 		}
 	]
 }

@@ -33,7 +33,7 @@ layui.use(['form', 'element', 'layer', 'jquery'], function () {
                 dataType: "json",
                 success: function (data) {
                     var new_version = data.version;
-                    if (new_version != item.version) {
+                    if (new_version > item.version) {
                         $("#new_version,#new").css('color', '#FF5722');
                         $("#new").text('更新提示');
                         $("#new_version").text('有新版本可以更新');
