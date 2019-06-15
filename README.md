@@ -3,59 +3,63 @@
 </p>
 <h1 align="center">AmoliCloud</h1>
 
-> 😊私有云存储系统，支持本地存储以及阿里云OSS，提供简单的文件列表、上传下载、管理等功能。
+> 😊一款轻量级的私有云存储系统，支持本地、阿里云OSS、腾讯云COS存储，提供简单的文件列表、上传下载、管理等功能。
 
 [![npm](https://img.shields.io/npm/l/dplayer.svg?style=flat-square)](https://github.com/ChinaMoli/AmoliCloud/blob/master/LICENSE)
 [![Travis](https://img.shields.io/travis/MoePlayer/DPlayer.svg?style=flat-square)](https://travis-ci.org/ChinaMoli/AmoliCloud)
 
-## 预览/Demo
+### 预览/Demo
+-----
 *  <https://demo.amoli.co>
-* ![](https://s2.ax1x.com/2019/06/09/VDj48f.jpg)
+![](https://s2.ax1x.com/2019/06/09/VDj48f.jpg)
 
-## 部署/Build
-* 环境：
-PHP >= 5.6 推荐7.x，cURL()支持
-* 下载：
+### 注意事项/Attention
+-----
+#### 环境
+**运行环境**：PHP 5.6+ 推荐7.x，cURL()支持
+**开发环境**：PHP 7.0、Nginx、Windows
+#### 兼容性
+支持IE9及以上的现代浏览器，并且已在 Chrome、firefox、IE11 等浏览器测试使用正常
+#### 版权
+本程序由 无名氏Studio(https://wums.cn) 开发，您可以随意修改、使用、转载。使用或转载时请务必保留出处，保留版权是对作者最大的尊重！
+
+#### 部署/Build
+-----
+#### 下载：
 Releases：<https://github.com/ChinaMoli/AmoliCloud/releases>，或使用git：
 ~~~
-# git clone https://github.com/ChinaMoli/AmoliCloud.git
+git clone https://github.com/ChinaMoli/AmoliCloud.git
 ~~~
-* 更新：
+#### 更新：
 Releases：<https://github.com/ChinaMoli/AmoliCloud/releases>，或使用git
 ~~~
-# git clone https://github.com/ChinaMoli/AmoliCloud.git
+git clone https://github.com/ChinaMoli/AmoliCloud.git
 ~~~
-* 配置OSS服务：
-1. 开通OSS服务、新建存储空间、上传文件：[OSS新手入门](https://promotion.aliyun.com/ntms/ossedu2.html)
-2. 了解基本的OSS属性信息，得到Endpoint
-3. 申请具有对应访问权限的AccessKey
-4. 详细获取教程&OSS配置<https://wums.cn/archives/AMoliCloud-deploy.html>
 
-## 更新日志/ChangeLog
-```
-version 4.1.0 2019-06-09
+### 帮助/Help
+-----
+* **详细搭建教程**：<https://wums.cn/archives/AmoliCloud-install.html>
+* **OSS配置教程**：<https://wums.cn/archives/AMoliCloud-deploy.html>
+* **COS配置教程**：<https://wums.cn/archives/AmoliCloud-CosConfig.html>
 
-    [新增] 自动检测更新，提示更新
-    [新增] 本地存储，没有OSS也可以使用
-    [新增] 首页验证开关(留空即为关闭)
-    [新增] 首页后台系统基本参数
-    [新增] 未知Bug无数
-    [优化] 自动提示安装，避免误操作
-    [优化] 增加多处备注，避免误操作
-    [优化] 将常用功能放在后台首页，方便使用
-    [优化] 登录步骤，加入简单的验证机制
-    [优化] OSS设置和网站设置合并为一个页面
-    [优化] 多处细节，提升访问速度
-    [修复] 修复后台已知Bug
-```
+### 更新日志/ChangeLog
+-----
+#### version 4.2.0 `2019-06-15`
+* [新增] COS对象存储
+* [新增] OSS单独选择文件夹列出(默认为根目录)
+* [新增] 未知Bug无数
+* [优化] 上传成功后自动刷新当前目录
+* [优化] 多处细节，提升访问速度
+* [修复] 本地存储上传文件卡顿，大文件出错
+
 更多：[CHANGELOG.md](https://github.com/ChinaMoli/AmoliCloud/blob/master/CHANGELOG.md)
 
-## 后续可能的改动/Preview
-```
-增加七牛云，腾讯云，又拍云的主流存储
-```
+### 更新计划/Preview
+-----
+* 增加七牛云、又拍云等主流对象存储
 
-## 开源协议/License
+### 开源协议/License
+-----
 ```
 MIT License
 
