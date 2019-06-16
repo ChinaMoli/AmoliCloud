@@ -3,22 +3,16 @@ error_reporting(0); // 关闭错误提示
 date_default_timezone_set('Asia/Shanghai');
 header('Content-Type: text/html; charset=UTF-8');
 require_once '../app/class/Amoli.class.php';
-require_once '../app/sdk/autoload.php';
 $C = new Config('../Config');
 $Amoli = new Amoli();
 $user = $C->get('user');
 $pass = $C->get('pass');
-$Cookie = $_COOKIE['Admin_' . $user];
 $act = $_GET['act'];
 $dir = $_GET['dir'];
-$bucket = $C->get('bucket');
-$endpoint = $C->get('endpoint');
-$accessKeyId = $C->get('accessKeyId');
-$accessKeySecret = $C->get('accessKeySecret');
-use OSS\OssClient;
-use OSS\Core\OssException;
-use OSS\Model\CorsConfig;
-use OSS\Model\CorsRule;
+$oss = $C->get('oss');
+$cos = $C->get('cos');
+$type = $C->get('type', 'local');
+$Cookie = $_COOKIE['Admin_' . $user];
 // 判断是否登录(排除登录操作)
 if (!isset($Cookie) || $Cookie != $pass) {
     if ($act != 'login') {
@@ -28,188 +22,111 @@ if (!isset($Cookie) || $Cookie != $pass) {
 }
 switch ($act) {
     case 'getList': // 加载目录
-        if ($C->get('type') == 'oss') {
-            try {
-                $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
-                $options = array('prefix' => $dir, 'max-keys' => '1000');
-                $listObjectInfo = $ossClient->listObjects($bucket, $options);
-                $prefixlist = $listObjectInfo->getPrefixList();
-                $objectList = $listObjectInfo->getObjectList();
-                // 判断是否根目录 （非根目录则显示返回上一层）
-                if ($dir) {
-                    $result[] = ['type' => 'reply', 'name' => '返回上一层', 'size' => '', 'time' => ''];
-                }
-                if (!empty($prefixlist)) {
-                    foreach ($prefixlist as $prefixInfo) {
-                        $Wjj_Name = str_replace($dir, '', $prefixInfo->getPrefix()); //替换掉多于的文件夹名 只剩当前文件夹名
-                        $Wjj_Name = str_replace("/", '', $Wjj_Name); // 去掉当前文件夹名的“/”
-                        $result[] = [
-                            'type' => 'wjj',
-                            'name' => $Wjj_Name,
-                            'size' => '',
-                            'time' => ''
-                        ];
-                    }
-                }
-                if (!empty($objectList)) {
-                    foreach ($objectList as $objectInfo) {
-                        $Wj_Name = str_replace($dir, '', $objectInfo->getKey());
-                        if ($Wj_Name != '') {
-                            $Wj_Size = $Amoli->getFilesize($objectInfo->getSize());
-                            $Wj_Time = date("Y-m-d H:i", strtotime($objectInfo->getLastModified()));
-                            $result[] = [
-                                'type' => $Amoli->getStamp($Wj_Name),
-                                'name' => $Wj_Name,
-                                'size' => $Wj_Size,
-                                'time' => $Wj_Time
-                            ];
-                        }
-                    }
-                }
-                // 文件夹下没有文件输出提示
-                if (empty($result)) {
-                    $result[] = ['type' => "null", 'name' => "提示：当前文件夹下没有文件", 'size' => "", 'time' => ""];
-                }
-            } catch (OssException $e) {
-                $result = ['msg' => $e->getMessage()];
-            }
-        } else {
-            $folder = [];
-            $file2 = [];
-            // 判断是否根目录 （非根目录则显示返回上一层）
-            if ($dir) {
-                $folder[] = ['type' => 'reply', 'name' => '返回上一层', 'size' => '', 'time' => ''];
-            }
-            $dir = $_SERVER['DOCUMENT_ROOT'] . '/' . $Amoli->getEncoding($C->get('localhost') . $dir, true);
-            $list = scandir($dir);
-            foreach ($list as $file) {
-                $file_location = $dir . $file;
-                $filesize = filesize($file_location);
-                $filestime = date("Y-m-d H:i", filemtime($file_location));
-                $file = $Amoli->getEncoding($file);
-                if (is_dir($file_location) && $file != '.' && $file != '..') {
-                    $folder[] = [
-                        'type' => 'wjj',
-                        'name' => $file,
-                        'size' => '',
-                        'time' => ''
-                    ];
-                } elseif ($file != '.' && $file != '..') {
-                    $file2[] = [
-                        'type' => $Amoli->getStamp($file),
-                        'name' => $file,
-                        'size' => $Amoli->getFilesize($filesize),
-                        'time' => $filestime
-                    ];
-                }
-            }
-            $result = array_merge($folder, $file2);
+        $reply = [];
+        ($dir) ? $reply[] = ['type' => 'reply', 'name' => '返回上一层', 'size' => '', 'time' => ''] : '';
+        switch ($type) {
+            case 'local':
+                $dir = $_SERVER['DOCUMENT_ROOT'] . '/' . $Amoli->getEncoding($C->get('localhost') . $dir, true);
+                $list = $Amoli->getLocalList($dir);
+                break;
+            case 'oss':
+                $dir = $oss['osshost'] . $dir;
+                $list = $Amoli->getOssList($oss['bucket'], $oss['endpoint'], $oss['accessKeyId'], $oss['accessKeySecret'], $dir);
+                break;
+            case 'cos':
+                $dir = $cos['coshost'] . $dir;
+                $list = $Amoli->getCosList($cos['bucket'], $cos['region'], $cos['secretId'], $cos['secretKey'], $dir);
+                break;
         }
+        $result = array_merge($reply, (array)$list);
         break;
     case 'Downfile': // 下载文件
-        preg_match('/dir=(.*)/i', $_SERVER["QUERY_STRING"], $dir); // 用正则提取 $_SERVER["QUERY_STRING"] 里的 $dir=”
-        $dir = str_replace("+", "%2B", $dir[1]); // 替换$dir[1]里面的 “+”，后赋值给 $dir
-        $dir = UrlDecode($dir); // 将得到的$dir进行URL解码
-        if ($C->get('type') == 'oss') {
-            $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
-            $options = array('response-content-type' => 'application/octet-stream');
-            try {
-                $signedUrl = $ossClient->signUrl($bucket, $dir, 120, 'GET', $options);
-                $ossdomain = $C->get('ossdomain');
-                // 自定义域名
-                if ($ossdomain) {
-                    strstr($signedUrl, "http://") ? $protocol = 'http://' : $protocol = 'https://';
-                    $url = str_replace($protocol, $protocol . $bucket . '.', $endpoint);
-                    $signedUrl = str_replace($url, $protocol . $ossdomain, $signedUrl);
-                }
-                $result = ['msg' => true, 'url' => $signedUrl];
-            } catch (OssException $e) {
-                $result = ['msg' => $e->getMessage()];
-            }
-        } else {
-            $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
-            $url = $protocol . $_SERVER['SERVER_NAME'] . ':' . $_SERVER["SERVER_PORT"] . '/' . $C->get('localhost') . $dir;
-            $result = ['msg' => true, 'url' => $url];
+        $object = $Amoli->DirEncoding($_SERVER["QUERY_STRING"]);
+        switch ($type) {
+            case 'local':
+                $url = '/' . $C->get('localhost') . $object;
+                $result = ['code' => '0', 'msg' => true, 'url' => $url];
+                break;
+            case 'oss':
+                $object = $oss['osshost'] . $object;
+                $result = $Amoli->getOssUrl($oss['bucket'], $oss['endpoint'], $oss['accessKeyId'], $oss['accessKeySecret'], $oss['ossdomain'], $object);
+                break;
+            case 'cos':
+                $object = $cos['coshost'] . $object;
+                $result = $Amoli->getCosUrl($cos['bucket'], $cos['region'], $cos['secretId'], $cos['secretKey'], $object);
+                break;
+        }
+        break;
+    case 'NewFolder': // 新建目录
+        //判断目录格式
+        if ((strrpos($dir, '/') + 1) != strlen($dir)) {
+            $result = ['code' => '0', 'data' => ['msg' => '目录格式有误！']];
+            echo json_encode($result);
+            return;
+        };
+        switch ($type) {
+            case 'local':
+                $dir = $_SERVER['DOCUMENT_ROOT'] . '/' . $Amoli->getEncoding($C->get('localhost') . $dir, true);
+                mkdir($dir, 0777, true) ? $msg = true : $msg = false;
+                $result = ['code' => '0', 'msg' => $msg];
+                break;
+            case 'oss':
+                $dir = $oss['osshost'] . $dir;
+                $result = $Amoli->OssNewFolder($oss['bucket'], $oss['endpoint'], $oss['accessKeyId'], $oss['accessKeySecret'], $dir);
+                break;
+            case 'cos':
+                $dir = $cos['coshost'] . $dir;
+                $result = $Amoli->CosNewFolder($cos['bucket'], $cos['region'], $cos['secretId'], $cos['secretKey'], $dir);
+                break;
         }
         break;
     case 'Delfile': // 删除文件
-        preg_match('/dir=(.*)/i', $_SERVER["QUERY_STRING"], $dir); // 用正则提取 $_SERVER["QUERY_STRING"] 里的 $dir=”
-        $dir = str_replace("+", "%2B", $dir[1]); // 替换$dir[1]里面的 “+”，后赋值给 $dir
-        $dir = UrlDecode($dir); // 将得到的$dir进行URL解码
-        if ($C->get('type') == 'oss') {
-            try {
-                $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
-                $ossClient->deleteObject($bucket, $dir);
-                $result = ['msg' => 'ok'];
-            } catch (OssException $e) {
-                $result = ['msg' => $e->getMessage()];
-            }
-        } else {
-            $file = $_SERVER['DOCUMENT_ROOT'] . '/' . $Amoli->getEncoding($C->get('localhost') . $dir, true);
-            if (unlink($file)) {
-                $result = ['msg' => 'ok'];
-            } else {
-                $result = ['msg' => '删除失败！'];
-            }
+        $object = $Amoli->DirEncoding($_SERVER["QUERY_STRING"]);
+        switch ($type) {
+            case 'local':
+                $file = $_SERVER['DOCUMENT_ROOT'] . '/' . $Amoli->getEncoding($C->get('localhost') . $object, true);
+                if (unlink($file)) {
+                    $result = ['msg' => 'ok'];
+                } else {
+                    $result = ['msg' => '删除失败！'];
+                }
+                break;
+            case 'oss':
+                $object = $oss['osshost'] . $object;
+                $result = $Amoli->getOssDel($oss['bucket'], $oss['endpoint'], $oss['accessKeyId'], $oss['accessKeySecret'], $object);
+                break;
+            case 'cos':
+                $object = $cos['coshost'] . $object;
+                $result = $Amoli->getCosDel($cos['bucket'], $cos['region'], $cos['secretId'], $cos['secretKey'], $object);
+                break;
         }
         break;
-    case 'ossUpload': // OSS上传文件
-        function gmt_iso8601($time)
-        {
-            $dtStr = date("c", $time);
-            $mydatetime = new DateTime($dtStr);
-            $expiration = $mydatetime->format(DateTime::ISO8601);
-            $pos = strpos($expiration, '+');
-            $expiration = substr($expiration, 0, $pos);
-            return $expiration . "Z";
+    case 'Upfile': // 上传文件    
+        switch ($type) {
+            case 'local':
+                $filename = $_FILES['file']['name'];
+                if ($filename) {
+                    $source = $_FILES['file']['tmp_name'];
+                    $dir = $Amoli->getEncoding($C->get('localhost') . $dir . $filename, true);
+                    $destination = $_SERVER['DOCUMENT_ROOT'] . '/' . $dir;
+                    move_uploaded_file($source, $destination) ? $msg = '上传成功' : $msg = '上传失败';
+                    $data = ['msg' => $msg, 'name' => $filename];
+                }
+                break;
+            case 'oss':
+                $dir = $oss['osshost'] . $dir;
+                $data = $Amoli->OssUpfile($oss['bucket'], $oss['endpoint'], $oss['accessKeyId'], $oss['accessKeySecret'], $dir);
+                break;
+            case 'cos':
+                $dir = $cos['coshost'] . $dir;
+                $data = $Amoli->CosUpfile($cos['bucket'], $cos['region'], $cos['secretId'], $cos['secretKey'], $dir);
+                break;
         }
-        if (strstr($endpoint, "https://")) {
-            $Bucket = str_replace('https://', 'https://' . $bucket . '.', $endpoint);
-        } else {
-            $Bucket = str_replace('http://', 'http://' . $bucket . '.', $endpoint);
-        }
-        $callbackUrl = 'https://www.amoli.co/?GET';
-        $callback_param = [
-            'callbackUrl' => $callbackUrl,
-            'callbackBody' => 'filename=${object}&size=${size}&mimeType=${mimeType}&height=${imageInfo.height}&width=${imageInfo.width}',
-            'callbackBodyType' => "application/x-www-form-urlencoded"
-        ];
-        $callback_string = json_encode($callback_param);
-        $base64_callback_body = base64_encode($callback_string);
-        $now = time();
-        $expire = 300;
-        $end = $now + $expire;
-        $expiration = gmt_iso8601($end);
-        $condition = array(0 => 'content-length-range', 1 => 0, 2 => 1048576000);
-        $conditions[] = $condition;
-        $start = array(0 => 'starts-with', 1 => '$Key', 2 => $dir);
-        $conditions[] = $start;
-        $arr = array('expiration' => $expiration, 'conditions' => $conditions);
-        $policy = json_encode($arr);
-        $base64_policy = base64_encode($policy);
-        $string_to_sign = $base64_policy;
-        $signature = base64_encode(hash_hmac('sha1', $string_to_sign, $accessKeySecret, true));
-        $result = [
-            'accessid' => $accessKeyId,
-            'host' => $Bucket,
-            'policy' => $base64_policy,
-            'signature' => $signature,
-            'expire' => $end,
-            'callback' => $base64_callback_body,
-            'dir' => $dir
-        ];
-        break;
-    case 'localUpload': // 本地上传文件
-        $filename = $_FILES['file']['name'];
-        $filesize = $_FILES['file']['size'];
-        $source = $_FILES['file']['tmp_name'];
-        $dir = $Amoli->getEncoding($C->get('localhost') . $dir . $filename, true);
-        $destination = $_SERVER['DOCUMENT_ROOT'] . '/' . $dir;
-        move_uploaded_file($source, $destination) ? $msg = '上传成功' : $msg = '上传失败';
-        $result = ['msg' => $msg, 'name' => $filename, 'size' => $filesize];
+        $result = array_merge(['type' => $type], (array)$data);
         break;
     case 'systemParameter': // 系统基本参数
         $result = $C->get() + [
+            'tongji' => ($_GET['bool']) ? file_get_contents('../static/js/tj.js') : '',
             'server' => PHP_OS,
             'host' => $_SERVER['HTTP_HOST'],
             'root' => $_SERVER['DOCUMENT_ROOT'],
@@ -223,34 +140,28 @@ switch ($act) {
         $type = $_POST['type'];
         $C->set('type', $type);
         $C->set('localhost', $_POST['localhost']);
-        $bucket = $_POST['bucket'];
-        $endpoint = $_POST['endpoint'];
-        $accessKeyId = $_POST['accessKeyId'];
-        $accessKeySecret = $_POST['accessKeySecret'];
-        $C->set('bucket', $bucket);
-        $C->set('endpoint', $endpoint);
-        $C->set('accessKeyId', $accessKeyId);
-        $C->set('accessKeySecret', $accessKeySecret);
-        $C->set('ossdomain', $_POST['ossdomain']);
+        $oss = $_POST['oss'];
+        $C->set('oss', $oss);
+        $cos = $_POST['cos'];
+        $C->set('cos', $cos);
         $C->set('indexpass', $_POST['indexpass']);
         $C->set('record', $_POST['record']);
         $msg = $C->save();
-        if ($type == "oss") { // 设置跨域资源共享规则
-            $corsConfig = new CorsConfig();
-            $rule = new CorsRule();
-            $rule->addAllowedHeader("*");
-            $rule->addAllowedOrigin("*");
-            $rule->addAllowedMethod("POST");
-            $rule->setMaxAgeSeconds(0);
-            $corsConfig->addRule($rule);
-            $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
-            $ossClient->putBucketCors($bucket, $corsConfig);
+        //统计代码
+        $file_strm = fopen('../static/js/tj.js', 'w');
+        if (!$file_strm) $msg = '写入文件失败，请赋予 tj.js 文件写权限！';
+        fwrite($file_strm, $_POST['tongji']);
+        fclose($file_strm);
+        //设置跨域规则
+        switch ($type) {
+            case 'oss':
+                $Amoli->OssCors($oss['bucket'], $oss['endpoint'], $oss['accessKeyId'], $oss['accessKeySecret']);
+                break;
+            case 'cos':
+                $Amoli->CosCors($cos['bucket'], $cos['region'], $cos['secretId'], $cos['secretKey']);
+                break;
         }
-        if ($msg) {
-            $result = ['msg' => '修改成功！'];
-        } else {
-            $result = ['msg' => $msg];
-        }
+        ($msg == true) ? $result = ['msg' => '修改成功！'] : $result = ['msg' => $msg];
         break;
     case 'login': // 登录后台
         $POST_user = $_POST['user'];

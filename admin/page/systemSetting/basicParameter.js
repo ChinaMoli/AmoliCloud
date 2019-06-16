@@ -5,21 +5,35 @@ layui.use(['form', 'layer', 'jquery'], function () {
 
 	// 加载网站设置
 	$.ajax({
-		url: "../../ajax.php?act=systemParameter",
+		url: "../../ajax.php?act=systemParameter&bool=true",
 		type: "get",
 		dataType: "json",
 		success: function (data) {
-			var item = data.data;
+			var item = data.data,
+				oss = item.oss,
+				cos = item.cos;
 			$(".name").val(item.name);
+			(!item.type) ? item.type = 'local' : '';//默认为本地存储
+			$('input[type="radio"][value="' + item.type + '"]').prop('checked', true);
 			RadioOn(item.type);
 			$(".localhost").val(item.localhost);
-			$(".bucket").val(item.bucket);
-			$(".endpoint").val(item.endpoint);
-			$(".accessKeyId").val(item.accessKeyId);
-			$(".accessKeySecret").val(item.accessKeySecret);
-			$(".ossdomain").val(item.ossdomain);
+
+			$(".OssBucket").val(oss.bucket);
+			$(".endpoint").val(oss.endpoint);
+			$(".accessKeyId").val(oss.accessKeyId);
+			$(".accessKeySecret").val(oss.accessKeySecret);
+			$(".ossdomain").val(oss.ossdomain);
+			$(".osshost").val(oss.osshost);
+
+			$(".CosBucket").val(cos.bucket);
+			$(".region").val(cos.region);
+			$(".secretId").val(cos.secretId);
+			$(".secretKey").val(cos.secretKey);
+			$(".coshost").val(cos.coshost);
+
 			$(".indexpass").val(item.indexpass);
 			$(".record").val(item.record);
+			$(".tongji").val(item.tongji);
 		}
 	})
 
@@ -28,13 +42,24 @@ layui.use(['form', 'layer', 'jquery'], function () {
 		var name = $('.name').val(),
 			type = $("input[name='type']:checked").val(),
 			localhost = $('.localhost').val(),
-			bucket = $('.bucket').val(),
-			endpoint = $('.endpoint').val(),
-			accessKeyId = $('.accessKeyId').val(),
-			accessKeySecret = $('.accessKeySecret').val(),
-			ossdomain = $('.ossdomain').val(),
+			oss = {
+				'bucket': $('.OssBucket').val(),
+				'endpoint': $('.endpoint').val(),
+				'accessKeyId': $('.accessKeyId').val(),
+				'accessKeySecret': $('.accessKeySecret').val(),
+				'ossdomain': $('.ossdomain').val(),
+				'osshost': $('.osshost').val()
+			},
+			cos = {
+				'bucket': $('.CosBucket').val(),
+				'region': $('.region').val(),
+				'secretId': $('.secretId').val(),
+				'secretKey': $('.secretKey').val(),
+				'coshost': $('.coshost').val()
+			},
 			indexpass = $('.indexpass').val(),
 			record = $('.record').val(),
+			tongji = $('.tongji').val(),
 			index = layer.msg('数据提交中，请稍候', { icon: 16, time: false, shade: 0.8 });
 		$.ajax({
 			url: "../../ajax.php?act=webconfig",
@@ -43,13 +68,11 @@ layui.use(['form', 'layer', 'jquery'], function () {
 				'name': name,
 				'type': type,
 				'localhost': localhost,
-				'bucket': bucket,
-				'endpoint': endpoint,
-				'accessKeyId': accessKeyId,
-				'accessKeySecret': accessKeySecret,
-				'ossdomain': ossdomain,
+				'oss': oss,
+				'cos': cos,
 				'indexpass': indexpass,
-				'record': record
+				'record': record,
+				'tongji': tongji
 			},
 			dataType: "json",
 			success: function (data) {
@@ -64,22 +87,31 @@ layui.use(['form', 'layer', 'jquery'], function () {
 		RadioOn(data.value);
 	})
 	function RadioOn(type = 'local') {
-		var radios = $('input[type="radio"][name="type"]');
-		if (type == "local") {
-			$("legend").text('本地存储 - 配置');
-			radios.eq(0).prop("checked", true);// 选择本地
-			radios.eq(1).prop("checked", false);// 取消OSS
-			$(".LocalConfig").removeClass('layui-hide');// 显示
-			$(".OssConfig").addClass('layui-hide');// 隐藏
-			$(".bucket,.endpoint,.accessKeyId,.accessKeySecret").removeAttr('lay-verify');// 关闭必填
-		} else {
-			$("legend").text('OSS存储 - 配置');
-			radios.eq(0).prop("checked", false);
-			radios.eq(1).prop("checked", true);
-			$(".LocalConfig").addClass('layui-hide');
-			$(".OssConfig").removeClass('layui-hide');
-			$(".endpoint").attr('lay-verify', 'url');
-			$(".bucket,.accessKeyId,.accessKeySecret").attr('lay-verify', 'required');
+		switch (type) {
+			case 'local':
+				$("legend").text('本地存储 - 配置');
+				$(".LocalConfig").removeClass('layui-hide');// 显示
+				$(".OssConfig").addClass('layui-hide');// 隐藏
+				$(".CosConfig").addClass('layui-hide');// 隐藏
+				$(".OssBucket,.endpoint,.accessKeyId,.accessKeySecret").removeAttr('lay-verify');// 关闭Oss必填
+				$(".CosBucket,.region,.secretId,.secretKey").removeAttr('lay-verify');// 关闭Cos必填
+				break;
+			case 'oss':
+				$("legend").text('OSS存储 - 配置');
+				$(".LocalConfig").addClass('layui-hide');
+				$(".OssConfig").removeClass('layui-hide');
+				$(".CosConfig").addClass('layui-hide');
+				$(".endpoint").attr('lay-verify', 'url');
+				$(".OssBucket,.accessKeyId,.accessKeySecret").attr('lay-verify', 'required');
+				$(".CosBucket,.region,.secretId,.secretKey").removeAttr('lay-verify');
+				break;
+			case 'cos':
+				$("legend").text('COS存储 - 配置');
+				$(".LocalConfig").addClass('layui-hide');
+				$(".OssConfig").addClass('layui-hide');
+				$(".CosConfig").removeClass('layui-hide');
+				$(".CosBucket,.region,.secretId,.secretKey").attr('lay-verify', 'required');
+				$(".OssBucket,.endpoint,.accessKeyId,.accessKeySecret").removeAttr('lay-verify');
 		}
 		form.render();// 更新单选框状态
 	}

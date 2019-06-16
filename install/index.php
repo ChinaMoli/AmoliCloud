@@ -186,7 +186,7 @@ switch ($step) {
             $C->set('record',$record);// 网站备案号
             $C->set('user',$user);// 后台账户
             $C->set('pass',$pass);// 后台密码
-            $C->set('version','4.1.0');// 程序版本号
+            $C->set('version','4.2.0');// 程序版本号
             $msg = $C->save();
             if($msg){
                 file_put_contents("install.lock",'www.amoli.co') ? $result = '安装完成!' : $result = 'install.lock写入失败!';
