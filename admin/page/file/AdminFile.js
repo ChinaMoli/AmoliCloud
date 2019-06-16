@@ -10,18 +10,12 @@ layui.use(['layer', 'jquery', 'table'], function () {
 		type: "get",
 		dataType: "json",
 		success: function (data) {
-			var Headbar = '<div class="layui-btn-container">';
-			if (data.data.type == 'oss') {
-				Headbar += '<button class="layui-btn layui-btn-sm layui-bg-red" lay-event="ossUpload">上传文件</button>';
-			} else {
-				Headbar += '<button class="layui-btn layui-btn-sm" lay-event="localUpload">上传文件</button>';
-			}
-			Headbar += '<button class="layui-btn layui-btn-sm layui-bg-blue" lay-event="break">刷新目录</button></div>'
 			// 文件列表
+			var loading = layer.load(0, { shade: false });
 			tableIns = table.render({
 				elem: '#List',
 				url: '../../ajax.php?act=getList&dir=',
-				toolbar: Headbar,
+				toolbar: '<div class="layui-btn-container"><button class="layui-btn layui-btn-sm layui-bg-red" lay-event="Upload">上传文件</button><button class="layui-btn layui-btn-sm layui-bg-cyan" lay-event="NewFolder">新建目录</button><button class="layui-btn layui-btn-sm layui-bg-blue" lay-event="break">刷新目录</button></div>',
 				defaultToolbar: ['', '', ''],
 				size: 'sm',
 				cols: [[
@@ -32,36 +26,67 @@ layui.use(['layer', 'jquery', 'table'], function () {
 					{ title: '操作', width: 120, templet: '#ListBar', align: "center", unresize: true }
 				]]
 			});
+			layer.close(loading);
 		}
 	})
-
+	function reload(NowDir) {
+		var loading = layer.load(0, { shade: false });
+		tableIns.reload({
+			url: '../../ajax.php?act=getList&dir=' + NowDir
+		});
+		layer.close(loading);
+	}
 	// 工具栏事件
 	table.on('toolbar(List)', function (obj) {
+		var NowDir = $('#NowDir').val();
 		switch (obj.event) {
-			case 'ossUpload':
+			case 'Upload':
 				layer.open({
 					type: 1,
-					title: 'OSS - 上传文件',
+					title: '上传文件 - Amoli私有云',
 					area: ['70%', '80%'],
-					content: '<div class="page-container"><blockquote class="layui-elem-quote">1.文件上传位置为当前目录 当前上传目录：<span id="NowDir" style="color:#FF5722;">' + $('#NowDir').val() + '</span><br>2.为不影响你的正常使用，请上传完成后再关闭此窗口</blockquote><div class="layui-upload"><div class="layui-upload-list"><table class="layui-table"><thead><tr><th>文件名</th><th>大小</th><th>进度</th><th>状态</th></tr></thead><tbody id="demoList"></tbody></table></div></div><div id="container"><a id="selectfiles" href="javascript:;" class="layui-btn layui-btn-normal">选择文件</a><a id="postfiles" href="javascript:;" class="layui-btn">开始上传</a></div><script type="text/javascript" src="page/file/upload/plupload/plupload.full.min.js"></script><script type="text/javascript" src="page/file/upload/ossUpload.js"></script></div>'
+					content: '<div class="page-container"><blockquote class="layui-elem-quote">1.文件上传位置为当前目录 当前上传目录：<span id="NowDir" style="color:#FF5722;">' + NowDir + '</span><br>2.为不影响你的正常使用，请上传完成后再关闭此窗口</blockquote><div class="layui-upload"><div class="layui-upload-list"><table class="layui-table"><thead><tr><th>文件名</th><th>大小</th><th>进度</th><th>状态</th></tr></thead><tbody id="demoList"></tbody></table></div></div><div id="container"><a id="selectfiles" href="javascript:;" class="layui-btn layui-btn-normal">选择文件</a><a id="postfiles" href="javascript:;" class="layui-btn">开始上传</a></div><script type="text/javascript" src="../static/js/jquery.min.js"></script></div><script type="text/javascript" src="page/file/upload/plupload/plupload.full.min.js"></script><script type="text/javascript" src="page/file/upload/Upload.js"></script>',
+					end: function () { reload(NowDir); }
 				});
 				break;
-			case 'localUpload':
-				layer.open({
-					type: 1,
-					title: '本地 - 上传文件',
-					area: ['70%', '80%'],
-					content: '<div class="page-container"><blockquote class="layui-elem-quote">1.文件上传位置为当前目录 当前上传目录：<span id="NowDir" style="color:#FF5722;">' + $('#NowDir').val() + '</span><br>2.为不影响你的正常使用，请上传完成后再关闭此窗口</blockquote><div class="layui-upload"><div class="layui-upload-list"><table class="layui-table"><thead><tr><th>文件名</th><th>大小</th><th>进度</th><th>状态</th></tr></thead><tbody id="demoList"></tbody></table></div><button type="button"class="layui-btn layui-btn-normal"id="selectfiles">选择文件</button><button type="button"class="layui-btn"id="postfiles">开始上传</button></div></div></script><script type="text/javascript" src="page/file/upload/localUpload.js"></script>'
+			case 'NewFolder':
+				layer.prompt({
+					title: '新建目录',
+					btn: ['确认'],
+					content: '<div class="layui-form-item">'
+						+ '<label class="layui-form-label">目录名</label>'
+						+ '<div class="layui-input-block">'
+						+ '<input type="text" value="" placeholder="请输入目录名" class="layui-layer-input Folder">'
+						+ '<br>'
+						+ '<p>'
+						+ '<span class="layui-red">目录命名规范</span>：<br>'
+						+ '1. 可用数字、中英文和可见字符的组合<br>'
+						+ '2. 必须用<span class="layui-red"> / </span>结尾<br>'
+						+ '3. 用<span class="layui-red"> / </span>分割路径，可快速创建子目录<br>'
+						+ '4. 不允许: <span class="layui-red">文件夹为空</span>；<span class="layui-red">连续 / </span>；<span class="layui-red">以 / 开头</span><br>'
+						+ '5. 不允许以<span class="layui-red"> .. </span>作为文件夹名称'
+						+ '</p>'
+						+ '</div>'
+						+ '</div>',
+					yes: function (index, layero) {
+						$.ajax({
+							url: '../../ajax.php?act=NewFolder&dir=' + NowDir + layero.find('.Folder').val(),
+							dataType: "json",
+							success: function (data) {
+								if (data.data.msg == true) {
+									layer.msg('创建成功！', { icon: 1, time: 1000 });
+								} else {
+									layer.msg('错误代码：<br>' + data.data.msg, { icon: 2, time: 1000 });
+								}
+								layer.close(index);
+							}
+						})
+					},
+					end: function () { reload(NowDir); }
 				});
-				break;
-			case 'newfolder':
-				alert('等待发布');
 				break;
 			case 'break':
-				var NowDir = $('#NowDir').val();
-				tableIns.reload({
-					url: '../../ajax.php?act=getList&dir=' + NowDir
-				});
+				reload(NowDir);
 				break;
 		}
 	});
@@ -74,9 +99,7 @@ layui.use(['layer', 'jquery', 'table'], function () {
 			case 'setSign':
 				if (data.type == 'wjj') {// 加载目录表单
 					NowDir = NowDir + '/'; // 取当前目录
-					tableIns.reload({
-						url: '../../ajax.php?act=getList&dir=' + NowDir
-					});
+					reload(NowDir);
 					$('#NowDir').val(NowDir);// 置当前目录
 				}
 				if (data.type == 'reply') {// 返回上一层
@@ -89,9 +112,7 @@ layui.use(['layer', 'jquery', 'table'], function () {
 							UpDir += n[i] + '/';
 						}
 					}
-					tableIns.reload({
-						url: '../../ajax.php?act=getList&dir=' + UpDir
-					});
+					reload(UpDir);
 					$('#NowDir').val(UpDir);// 置当前目录
 				}
 				break;

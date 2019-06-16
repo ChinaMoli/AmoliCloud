@@ -14,6 +14,8 @@ $(function () {
                 })
                 return;
             }
+            // 保留版权是对作者最大的尊重。
+            console.info('欢迎使用 AmoliCloud!\n当前版本：' + data.version + ' \n作者：无名氏Studio(https://wums.cn)\n官网：Amoli私有云(https://www.amoli.co)\nGithub：https://github.com/ChinaMoli/AmoliCloud');
             $("title,.navbar-brand").prepend(data.name);// 配置前端信息
             $("#record").text(data.record);
             if (data.log) {
@@ -200,4 +202,3 @@ function login() {
     })
     return false;
 }
-console.log('%c Amoli私有云 - 帮助您快速搭建私有云盘系统 官网地址：https://www.amoli.co', 'font-size:20px;');

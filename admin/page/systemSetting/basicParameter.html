@@ -26,8 +26,9 @@
 			<div class="layui-form-item">
 				<label class="layui-form-label">存储模式</label>
 				<div class="layui-input-block">
-					<input type="radio" name="type" value="local" title="本地存储">
-					<input type="radio" name="type" value="oss" title="OSS存储">
+					<input type="radio" name="type" value="local" title="本地">
+					<input type="radio" name="type" value="oss" title="OSS">
+					<input type="radio" name="type" value="cos" title="COS">
 				</div>
 			</div>
 			<div class="layui-form-item">
@@ -37,7 +38,7 @@
 						<div class="layui-form-item">
 							<label class="layui-form-label">格式：</label>
 							<div class="layui-input-block">
-								<span class="layui-form-item" style="color: #FF5722;">目录名称，从根目录开始，以"/"结尾例如down/，text/img/<br>留空即为根目录</span>
+								<span class="layui-form-item" style="color: #FF5722;">目录名称，从根目录开始，必须以"/"结尾，例如down/，text/img/<br>留空即为根目录</span>
 							</div>
 						</div>
 						<div class="layui-form-item">
@@ -47,11 +48,11 @@
 							</div>
 						</div>
 					</div>
-					<div class="layui-field-box OssConfig layui-hide">
+					<div class="layui-field-box layui-hide OssConfig">
 						<div class="layui-form-item">
 							<label class="layui-form-label">Bucket</label>
 							<div class="layui-input-inline">
-								<input type="text" value="" placeholder="请输入 Bucket" class="layui-input bucket">
+								<input type="text" value="" placeholder="请输入 Bucket" class="layui-input OssBucket">
 							</div>
 							<div class="layui-form-mid" style="color: #FF5722;">OSS配置教程：&nbsp;<a target="_blank" href="https://wums.cn/archives/AMoliCloud-deploy.html">点此查看</a></div>
 						</div>
@@ -90,6 +91,58 @@
 									class="layui-input ossdomain">
 							</div>
 						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">目录路径</label>
+							<div class="layui-input-block">
+								<input type="text" value="" placeholder="请输入目录路径 请按照格式填写" class="layui-input osshost">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">格式：</label>
+							<div class="layui-input-block">
+								<span class="layui-form-item" style="color: #FF5722;">目录名称，必须以"/"结尾，例如down/，text/img/<br>留空即为根目录</span>
+							</div>
+						</div>
+					</div>
+					<div class="layui-field-box layui-hide CosConfig">
+						<div class="layui-form-item">
+							<label class="layui-form-label">空间名称</label>
+							<div class="layui-input-inline">
+								<input type="text" value="" placeholder="请输入 空间名称" class="layui-input CosBucket">
+							</div>
+							<div class="layui-form-mid" style="color: #FF5722;">COS配置教程：&nbsp;<a target="_blank" href="https://wums.cn/archives/AmoliCloud-CosConfig.html">点此查看</a></div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">所属地域</label>
+							<div class="layui-input-inline">
+								<input type="text" value="" placeholder="请输入 所属地域" class="layui-input region">
+							</div>
+							<div class="layui-form-mid" style="color: red;">格式:ap-地域 例如:ap-chengdu</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">SecretId</label>
+							<div class="layui-input-block">
+								<input type="text" value="" placeholder="请输入 SecretId" class="layui-input secretId">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">SecretKey</label>
+							<div class="layui-input-block">
+								<input type="text" value="" placeholder="请输入 SecretKey" class="layui-input secretKey">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">目录路径</label>
+							<div class="layui-input-block">
+								<input type="text" value="" placeholder="请输入目录路径 请按照格式填写" class="layui-input coshost">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">格式：</label>
+							<div class="layui-input-block">
+								<span class="layui-form-item" style="color: #FF5722;">目录名称，必须以"/"结尾，例如down/，text/img/<br>留空即为根目录</span>
+							</div>
+						</div>
 					</div>
 				</fieldset>
 			</div>
@@ -104,6 +157,12 @@
 				<label class="layui-form-label">网站备案号</label>
 				<div class="layui-input-block">
 					<input type="text" value="" placeholder="请输入网站备案号" class="layui-input record">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">统计代码</label>
+				<div class="layui-input-block">
+					<textarea value="" placeholder="请输入统计代码" class="layui-textarea tongji"></textarea>
 				</div>
 			</div>
 			<div class="layui-form-item">
