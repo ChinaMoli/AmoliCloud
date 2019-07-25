@@ -18,13 +18,14 @@
 #### 环境
 **运行环境**：PHP 5.6+ 推荐7.x，cURL()支持
 
-**开发环境**：PHP 7.0、Nginx、Windows
+**开发环境**：PHPstudy、PHP 7.2、Nginx、Windows
 
 #### 兼容性
 支持IE9及以上的现代浏览器，并且已在 Chrome、firefox、IE11 等浏览器测试使用正常
 
 #### 版权
-本程序由 无名氏Studio(https://wums.cn) 开发，您可以随意修改、使用、转载。使用或转载时请务必保留出处，保留版权是对作者最大的尊重！
+本程序由 无名氏Studio(https://wums.cn) 开发，您可以随意修改、使用、转载。
+**使用或转载时请务必保留出处，保留版权是对作者最大的尊重！**
 
 ### 部署/Build
 -----
@@ -42,23 +43,20 @@ git clone https://github.com/ChinaMoli/AmoliCloud.git
 
 ### 帮助/Help
 -----
-* **详细搭建教程**：<https://wums.cn/archives/AmoliCloud-install.html>
+* **详细搭建教程**：<https://wums.cn/archives/AmoliCloud-install.html> `暂时没写`
 * **OSS配置教程**：<https://wums.cn/archives/AMoliCloud-deploy.html>
 * **COS配置教程**：<https://wums.cn/archives/AmoliCloud-CosConfig.html>
 
 ### 更新日志/ChangeLog
 -----
-#### version 4.2.0 `2019-06-16`
-* [新增] 腾讯云COS对象存储
-* [新增] OSS单独选择文件夹列出(默认为根目录)
-* [新增] 后台设置前台统计代码
-* [新增] 后台创建目录，并且支持递归创建
-* [新增] 未知Bug无数
-* [优化] 上传成功后自动刷新当前目录
-* [优化] 多处细节，提升访问速度
-* [优化] 加入多处入口文件，提升程序安全
-* [修复] 本地存储上传文件卡顿，大文件出错
-* [修复] IIS环境下，后台加载出错
+#### version 4.2.1 `2019-07-18`
+* [优化] 前端细节，提升访问速度
+* [优化] 安装文件，加入判断条件
+* [优化] 后台上传时加入删除按钮
+* [优化] 统一PHP返回参数，方便二次开发
+* [优化] 前端细节，提升访问速度
+* [修复] 手机访问后台不能上传文件
+* [修复] 上个版本部分Bug，加入新Bug
 
 更多：[CHANGELOG.md](https://github.com/ChinaMoli/AmoliCloud/blob/master/CHANGELOG.md)
 
