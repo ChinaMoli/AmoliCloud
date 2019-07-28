@@ -13,7 +13,7 @@ $indexpass = $C->get('indexpass');
 $Cookie = $_COOKIE['Amoli_index'];
 // 判断是否登录
 if ($indexpass) {
-    if ($act == 'getList' || $act == 'getUrl') {
+    if ($act == 'getList') {
         if (!isset($Cookie) || $Cookie != md5($indexpass)) {
             $login = false;
             echo json_encode(['code' => 2, 'msg' => '你未登录，请先登录！']);
