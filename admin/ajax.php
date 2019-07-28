@@ -5,23 +5,23 @@ header('Content-Type: text/html; charset=UTF-8');
 require_once '../app/class/Amoli.class.php';
 $C = new Config('../Config');
 $Amoli = new Amoli();
-$user = $C->get('user');
-$pass = $C->get('pass');
 $act = $_GET['act'];
-$dir = $_GET['dir'];
 $oss = $C->get('oss');
 $cos = $C->get('cos');
+$user = $C->get('user');
+$pass = $C->get('pass');
 $type = $C->get('type', 'local');
-$Cookie = $_COOKIE['Admin_' . $user];
+$Cookie = $_COOKIE['AmoliAdmin_' . $user];
 // 判断是否登录(排除登录操作)
 if (!isset($Cookie) || $Cookie != $pass) {
     if ($act != 'login') {
-        echo json_encode(['code' => '-1', 'data' => null]);
+        echo json_encode(['code' => 2, 'msg' => '你未登录，请先登录！']);
         return;
     }
 }
 switch ($act) {
     case 'getList': // 加载目录
+        $dir = $_POST['dir'];
         $reply = [];
         ($dir) ? $reply[] = ['type' => 'reply', 'name' => '返回上一层', 'size' => '', 'time' => ''] : '';
         switch ($type) {
@@ -38,14 +38,15 @@ switch ($act) {
                 $list = $Amoli->getCosList($cos['bucket'], $cos['region'], $cos['secretId'], $cos['secretKey'], $dir);
                 break;
         }
-        $result = array_merge($reply, (array)$list);
+        $list = array_merge($reply, (array) $list);
+        $result = ['code' => 0, 'msg' => '获取成功！', 'data' => $list];
         break;
     case 'Downfile': // 下载文件
-        $object = $Amoli->DirEncoding($_SERVER["QUERY_STRING"]);
+        $object = $_POST['dir'];
         switch ($type) {
             case 'local':
                 $url = '/' . $C->get('localhost') . $object;
-                $result = ['code' => '0', 'msg' => true, 'url' => $url];
+                $result = ['code' => 1, 'msg' => '获取成功！', 'data' => ['url' => $url]];
                 break;
             case 'oss':
                 $object = $oss['osshost'] . $object;
@@ -58,17 +59,17 @@ switch ($act) {
         }
         break;
     case 'NewFolder': // 新建目录
+        $dir = $_POST['dir'];
         //判断目录格式
         if ((strrpos($dir, '/') + 1) != strlen($dir)) {
-            $result = ['code' => '0', 'data' => ['msg' => '目录格式有误！']];
+            $result = ['code' => 0, 'msg' => '目录格式有误！'];
             echo json_encode($result);
             return;
         };
         switch ($type) {
             case 'local':
                 $dir = $_SERVER['DOCUMENT_ROOT'] . '/' . $Amoli->getEncoding($C->get('localhost') . $dir, true);
-                mkdir($dir, 0777, true) ? $msg = true : $msg = false;
-                $result = ['code' => '0', 'msg' => $msg];
+                mkdir($dir, 0777, true) ? $result = ['code' => 1, 'msg' => '创建成功！'] : $result = ['code' => 2, 'msg' => '创建失败！'];
                 break;
             case 'oss':
                 $dir = $oss['osshost'] . $dir;
@@ -80,15 +81,22 @@ switch ($act) {
                 break;
         }
         break;
+    case 'share': // 分享文件
+        $object = $_POST['dir'];
+        $time = date('Y-m-d H:i:s');
+        $size = $_POST['size'];
+        $data = rawurlencode(base64_encode($object . '{/}' . $time . '{/}' . $size));
+        $result = ['code' => 1, 'msg' => '获取成功！', 'data' => ['url' => $Amoli->postShare($data)]];
+        break;
     case 'Delfile': // 删除文件
-        $object = $Amoli->DirEncoding($_SERVER["QUERY_STRING"]);
+        $object = $_POST['dir'];
         switch ($type) {
             case 'local':
                 $file = $_SERVER['DOCUMENT_ROOT'] . '/' . $Amoli->getEncoding($C->get('localhost') . $object, true);
                 if (unlink($file)) {
-                    $result = ['msg' => 'ok'];
+                    $result = ['code' => 1, 'msg' => '删除成功！'];
                 } else {
-                    $result = ['msg' => '删除失败！'];
+                    $result = ['code' => 2, 'msg' => '删除失败！'];
                 }
                 break;
             case 'oss':
@@ -101,7 +109,8 @@ switch ($act) {
                 break;
         }
         break;
-    case 'Upfile': // 上传文件    
+    case 'Upfile': // 上传文件
+        $dir = $_POST['dir'];
         switch ($type) {
             case 'local':
                 $filename = $_FILES['file']['name'];
@@ -122,29 +131,45 @@ switch ($act) {
                 $data = $Amoli->CosUpfile($cos['bucket'], $cos['region'], $cos['secretId'], $cos['secretKey'], $dir);
                 break;
         }
-        $result = array_merge(['type' => $type], (array)$data);
+        $data = array_merge(['type' => $type], (array) $data);
+        $result = ['code' => 1, 'msg' => '获取成功！', 'data' => $data];
         break;
     case 'systemParameter': // 系统基本参数
-        $result = $C->get() + [
+        $data = $C->get() + [
             'tongji' => ($_GET['bool']) ? file_get_contents('../static/js/tj.js') : '',
             'server' => PHP_OS,
             'host' => $_SERVER['HTTP_HOST'],
             'root' => $_SERVER['DOCUMENT_ROOT'],
             'server_software' => $_SERVER['SERVER_SOFTWARE'],
             'php_version' => PHP_VERSION,
-            'upload_max' => get_cfg_var("file_uploads") ? get_cfg_var("upload_max_filesize") : '空间不允许上传'
+            'upload_max' => get_cfg_var("file_uploads") ? get_cfg_var("upload_max_filesize") : '空间不允许上传',
+            'time' => date('Y-m-d H:i:s', time())
         ];
+        $result = ['code' => 1, 'msg' => '获取成功！', 'data' => $data];
         break;
     case 'webconfig': // 网站配置
         $C->set('name', $_POST['name']);
-        $type = $_POST['type'];
+        $type = trim($_POST['type']);
         $C->set('type', $type);
-        $C->set('localhost', $_POST['localhost']);
-        $oss = $_POST['oss'];
+        $C->set('localhost', trim($_POST['localhost']));
+        $oss = [
+            'bucket' => trim($_POST['OssBucket']),
+            'endpoint' => trim($_POST['endpoint']),
+            'accessKeyId' => trim($_POST['accessKeyId']),
+            'accessKeySecret' => trim($_POST['accessKeySecret']),
+            'ossdomain' => trim($_POST['ossdomain']),
+            'osshost' => trim($_POST['osshost'])
+        ];
         $C->set('oss', $oss);
-        $cos = $_POST['cos'];
+        $cos = [
+            'bucket' => trim($_POST['CosBucket']),
+            'region' => trim($_POST['region']),
+            'secretId' => trim($_POST['secretId']),
+            'secretKey' => trim($_POST['secretKey']),
+            'coshost' => trim($_POST['coshost'])
+        ];
         $C->set('cos', $cos);
-        $C->set('indexpass', $_POST['indexpass']);
+        $C->set('indexpass', trim($_POST['indexpass']));
         $C->set('record', $_POST['record']);
         $msg = $C->save();
         //统计代码
@@ -161,25 +186,24 @@ switch ($act) {
                 $Amoli->CosCors($cos['bucket'], $cos['region'], $cos['secretId'], $cos['secretKey']);
                 break;
         }
-        ($msg == true) ? $result = ['msg' => '修改成功！'] : $result = ['msg' => $msg];
+        ($msg == true) ? $result = ['code' => 1, 'msg' => '修改成功！'] : $result = ['code' => 2, 'msg' => $msg];
         break;
     case 'login': // 登录后台
         $POST_user = $_POST['user'];
         $POST_pass = MD5($_POST['pass'] . '$$Www.Amoli.Co$$');
         $loginTime = date('Y-m-d H:i:s');
         if ($POST_user == $user && $POST_pass == $pass) {
-            setcookie('Admin_' . $POST_user, $POST_pass, time() + 3600 * 24); // 写入Cookies
-            $result = ['msg' => '登录成功'];
+            setcookie('AmoliAdmin_' . $POST_user, $POST_pass, time() + 3600 * 24); // 写入Cookies
+            $result = ['code' => 1, 'msg' => '登录成功！'];
         } else {
-            $result = ['msg' => '帐号或者密码错误'];
+            $result = ['code' => 2, 'msg' => '帐号或者密码错误！'];
         }
         $C->set('loginTime', $loginTime);
         $C->save();
         break;
     case 'logout': // 退出登录
-        setcookie('Admin_' . $user, '', time() - 1552294270);
-        exit('<script language="javascript">alert("您已成功注销本次登陆！");window.location.href="index.html";</script>');
-        $result = ['msg' => '成功退出登录'];
+        setcookie('AmoliAdmin_' . $user, '', time() - 1552294270);
+        exit('<script language="javascript">alert("您已成功注销本次登陆！");window.location.href="./";</script>');
         break;
     case 'lock': // 锁屏验证
         $lockPwd = MD5($_POST['lockPwd'] . '$$Www.Amoli.Co$$');
@@ -194,16 +218,19 @@ switch ($act) {
         $POST_pass = MD5($_POST['pass'] . '$$Www.Amoli.Co$$');
         $POST_confirmPwd = $_POST['confirmPwd'];
         if ($POST_pass != $pass) {
-            $result = ['msg' => '密码错误，请重新输入！'];
+            $result = ['code' => 2, 'msg' => '密码错误，请重新输入！'];
         } else {
             $C->set('user', $POST_user);
             $C->set('pass', MD5($POST_confirmPwd . '$$Www.Amoli.Co$$'));
             $msg = $C->save();
-            ($msg) ? $result = ['msg' => '修改成功！'] : $result = ['msg' => $msg];
+            if ($msg) {
+                $result = ['code' => 1, 'msg' => '修改成功！'];
+            } else {
+                $result = ['code' => 2, 'msg' => $msg];
+            }
         }
         break;
     default:
-        $result = ['msg' => 'No Act!'];
+        $result = ['code' => 2, 'msg' => 'No Act!'];
 }
-$result = ['code' => '0', 'data' => $result];
 echo json_encode($result);

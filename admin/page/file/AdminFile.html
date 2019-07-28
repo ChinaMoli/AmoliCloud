@@ -12,7 +12,7 @@
 	<meta name="format-detection" content="telephone=no">
 	<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
 	<link rel="stylesheet" href="../../css/public.css" media="all" />
-	<script src="https://at.alicdn.com/t/font_1186130_j294f0s3a38.js"></script>
+	<script src="https://at.alicdn.com/t/font_1186130_04lkv4r5pub2.js"></script>
 	<style type="text/css">
 		.ico{width:18px}.size{width:100px}.time{width:140px}.icon{width:1em;height:1em;vertical-align:-0.15em;fill:currentColor;overflow:hidden;}
 	</style>	
@@ -23,13 +23,14 @@
 	<table id="List" lay-filter="List"></table>
 	<!--操作-->
 	<script type="text/html" id="ListBar">
-		{{#  if(d.type != 'wjj' && d.type != 'reply'){ }}
-			<a class="layui-btn layui-btn-xs layui-bg-blue" lay-event="down">下载</a>
+		{{#  if(d.type != 'null' && d.type != 'wjj' && d.type != 'reply'){ }}
+			<a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="share">分享</a>
+			<a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="down">下载</a>
 			<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
 		{{#  } }}
 	</script>
 	<script type="text/javascript" src="../../layui/layui.js"></script>
-	<script type="text/javascript" src="AdminFile.js"></script>
+	<script type="text/javascript" src="AdminFile.js?v=4.2.1"></script>
 </body>
 
 </html>

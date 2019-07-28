@@ -4,27 +4,33 @@ date_default_timezone_set('Asia/Shanghai');
 header('Content-Type: text/html; charset=UTF-8');
 require_once __DIR__ . '/app/class/Amoli.class.php';
 $act = $_GET['act'];
-$dir = $_GET['dir'];
 $C = new Config('Config');
 $Amoli = new Amoli();
 $oss = $C->get('oss');
 $cos = $C->get('cos');
 $type = $C->get('type', 'local');
-$indexpass = md5($C->get('indexpass'));
+$indexpass = $C->get('indexpass');
 $Cookie = $_COOKIE['Amoli_index'];
-($Cookie == $indexpass || $C->get('indexpass') == '') ? $log = true : $log = false;
-
+// 判断是否登录
+if ($indexpass) {
+    if ($act == 'getList' || $act == 'getUrl') {
+        if (!isset($Cookie) || $Cookie != md5($indexpass)) {
+            $login = false;
+            echo json_encode(['code' => 2, 'msg' => '你未登录，请先登录！']);
+            exit();
+        }
+    }
+}
 switch ($act) {
     case 'getConfig': // 获取配置
+        // 判断是否登录
+        ($Cookie == md5($indexpass) || !$indexpass) ? $log = true : $log = false;
+        // 判断是否安装
         file_exists('install/install.lock') ? $install = true : $install = false;
-        $result = ['code' => '0', 'name' => $C->get('name'), 'version' => $C->get('version'), 'record' => $C->get('record'), 'log' => $log, 'install' => $install];
+        $result = ['code' => 1, 'msg' => '获取成功！', 'data' => ['name' => $C->get('name'),  'record' => $C->get('record'), 'install' => $install, 'log' => $log]];
         break;
-
     case 'getList': // 加载目录
-        if (!$log) {
-            echo json_encode(['code' => '-1', 'msg' => '未登录', 'data' => null]);
-            return;
-        }
+        $dir = $_POST['dir'];
         switch ($type) {
             case 'local': //本地存储
                 $dir = $_SERVER['DOCUMENT_ROOT'] . '/' . $Amoli->getEncoding($C->get('localhost') . $dir, true);
@@ -39,44 +45,40 @@ switch ($act) {
                 $list = $Amoli->getCosList($cos['bucket'], $cos['region'], $cos['secretId'], $cos['secretKey'], $dir);
                 break;
         }
-        $result = ['code' => '0', 'msg' => '获取成功', 'data' => $list];
+        $result = ['code' => 1, 'msg' => '获取成功', 'data' => $list];
         break;
     case 'getUrl': // 获取文件下载Url
-        $object = $Amoli->DirEncoding($_SERVER["QUERY_STRING"]);
+        $dir = $_POST['dir'];
         switch ($type) {
             case 'local':
-                $url = '/' . $C->get('localhost') . $object;
-                $result = ['code' => '0', 'msg' => true, 'url' => $url];
+                $url = '/' . $C->get('localhost') . $dir;
+                $result = ['code' => 1, 'msg' => '获取成功！', 'data' => ['url' => $url]];
                 break;
             case 'oss':
-                $object = $oss['osshost'] . $object;
-                $signedUrl = $Amoli->getOssUrl($oss['bucket'], $oss['endpoint'], $oss['accessKeyId'], $oss['accessKeySecret'], $oss['ossdomain'], $object);
-                $result = $signedUrl;
+                $object = $oss['osshost'] . $dir;
+                $result = $Amoli->getOssUrl($oss['bucket'], $oss['endpoint'], $oss['accessKeyId'], $oss['accessKeySecret'], $oss['ossdomain'], $object);
                 break;
             case 'cos':
-                $object = $cos['coshost'] . $object;
-                $signedUrl = $Amoli->getCosUrl($cos['bucket'], $cos['region'], $cos['secretId'], $cos['secretKey'], $object);
-                $result = $signedUrl;
+                $object = $cos['coshost'] . $dir;
+                $result = $Amoli->getCosUrl($cos['bucket'], $cos['region'], $cos['secretId'], $cos['secretKey'], $object);
                 break;
         }
         break;
-
     case 'login': // 前台登录
-        $indexpass2 = md5($_POST['indexpass']);
-        if ($indexpass2 == $indexpass) {
-            setcookie('Amoli_index', $indexpass2, time() + 3600 * 24); // 写入Cookies
-            $result = ['msg' => true];
+        $POST_pass = md5($_POST['indexpass']);
+        if ($POST_pass == md5($indexpass)) {
+            setcookie('Amoli_index', $POST_pass, time() + 3600 * 24); // 写入Cookies
+            $result = ['code' => 1, 'msg' => '登录成功！'];
         } else {
-            $result = ['msg' => false];
+            $result = ['code' => 2, 'msg' => '密码错误！'];
         }
         break;
 
     case 'logout': // 退出登录
         setcookie('Amoli_index', '', time() - 1552294270);
-        exit('<script language="javascript">alert("您已成功注销本次登陆！");window.location.href="index.html";</script>');
+        exit('<script language="javascript">alert("您已成功注销本次登陆！");window.location.href="./";</script>');
         break;
-
     default:
-        echo 'No Act!';
+        $result = ['code' => 2, 'msg' => 'No Act!'];
 }
 echo json_encode($result);

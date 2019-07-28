@@ -1,6 +1,7 @@
-var user;
-layui.use(['form', 'element', 'layer', 'jquery'], function () {
-    var $ = layui.jquery;
+var user = 'Amoli私有云';
+layui.use(['jquery'], function () {
+    var $ = layui.jquery,
+        version = '4.2.1';
     //icon动画
     $(".panel a").hover(function () {
         $(this).find(".layui-anim").addClass("layui-anim-scaleSpring");
@@ -13,32 +14,32 @@ layui.use(['form', 'element', 'layer', 'jquery'], function () {
 
     // 加载系统基本参数
     $.ajax({
-        url: "../ajax.php?act=systemParameter",
-        type: "get",
-        dataType: "json",
+        url: '../ajax.php?act=systemParameter',
+        dataType: 'json',
         success: function (data) {
             var item = data.data;
             user = item.user;
-            $(".version").text(item.version);// 当前版本
-            $(".php_version").text(item.php_version);// PHP版本
-            $(".server").text(item.server);// 服务器环境
-            $(".host").text(item.host);// 服务器 (IP/端口)
-            $(".server_software").text(item.server_software);// 脚本解释引擎
-            $(".upload_max").text(item.upload_max);// 允许最大上传文件
-            $(".root").text(item.root);// 安装目录
-            $(".loginTime").text(item.loginTime);// 上次登录时间
+            $('.version').text(version);// 当前版本
+            $('.php_version').text(item.php_version);// PHP版本
+            $('.server').text(item.server);// 服务器环境
+            $('.host').text(item.host);// 服务器 (IP/端口)
+            $('.server_software').text(item.server_software);// 脚本解释引擎
+            $('.upload_max').text(item.upload_max);// 允许最大上传文件
+            $('.root').text(item.root);// 安装目录
+            $('.time').text(item.time);// 服务器当前时间
+            $('.loginTime').text(item.loginTime);// 上次登录时间
             // 检测更新
             $.ajax({
                 url: 'https://www.amoli.co/log/AmoliCloud.php?act=version',
                 dataType: "json",
                 success: function (data) {
                     var new_version = data.version;
-                    if (new_version > item.version) {
-                        $("#new_version,#new").css('color', '#FF5722');
-                        $("#new").text('更新提示');
-                        $("#new_version").text('有新版本可以更新');
+                    if (new_version > version) {
+                        $('#new_version,#new').css('color', '#FF5722');
+                        $('#new').text('更新提示');
+                        $('#new_version').text('有新版本可以更新');
                     } else {
-                        $("#new_version").text(new_version);
+                        $('#new_version').text(new_version);
                     }
                 }
             })

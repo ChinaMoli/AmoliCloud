@@ -39,51 +39,21 @@ layui.use(['form', 'layer', 'jquery'], function () {
 
 	// 修改网站配置
 	form.on("submit(WebConfig)", function (data) {
-		var name = $('.name').val(),
-			type = $("input[name='type']:checked").val(),
-			localhost = $('.localhost').val(),
-			oss = {
-				'bucket': $('.OssBucket').val(),
-				'endpoint': $('.endpoint').val(),
-				'accessKeyId': $('.accessKeyId').val(),
-				'accessKeySecret': $('.accessKeySecret').val(),
-				'ossdomain': $('.ossdomain').val(),
-				'osshost': $('.osshost').val()
-			},
-			cos = {
-				'bucket': $('.CosBucket').val(),
-				'region': $('.region').val(),
-				'secretId': $('.secretId').val(),
-				'secretKey': $('.secretKey').val(),
-				'coshost': $('.coshost').val()
-			},
-			indexpass = $('.indexpass').val(),
-			record = $('.record').val(),
-			tongji = $('.tongji').val(),
-			index = layer.msg('数据提交中，请稍候', { icon: 16, time: false, shade: 0.8 });
+		var index = layer.msg('数据提交中，请稍候', { icon: 16, time: false, shade: 0.8 });
 		$.ajax({
-			url: "../../ajax.php?act=webconfig",
-			type: "post",
-			data: {
-				'name': name,
-				'type': type,
-				'localhost': localhost,
-				'oss': oss,
-				'cos': cos,
-				'indexpass': indexpass,
-				'record': record,
-				'tongji': tongji
-			},
-			dataType: "json",
+			url: '../../ajax.php?act=webconfig',
+			type: 'POST',
+			data: data.field,
+			dataType: 'json',
 			success: function (data) {
-				setTimeout(function () { layer.close(index); layer.msg(data.data.msg, { icon: 1, time: 1000 }); }, 500);
+				setTimeout(function () { layer.close(index); layer.msg(data.msg, { icon: data.code, time: 1000 }); }, 500);
 			}
 		})
 		return false;
 	})
 
 	// 单选框点击
-	form.on("radio()", function (data) {
+	form.on('radio()', function (data) {
 		RadioOn(data.value);
 	})
 	function RadioOn(type = 'local') {

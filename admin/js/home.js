@@ -4,9 +4,8 @@ layui.config({
 }).extend({
 	"bodyTab": "bodyTab"
 })
-layui.use(['bodyTab', 'form', 'element', 'layer', 'jquery'], function () {
-	var form = layui.form,
-		element = layui.element,
+layui.use(['bodyTab', 'element', 'layer', 'jquery'], function () {
+	var element = layui.element,
 		$ = layui.$,
 		layer = parent.layer === undefined ? layui.layer : top.layer;
 	tab = layui.bodyTab({
@@ -17,13 +16,13 @@ layui.use(['bodyTab', 'form', 'element', 'layer', 'jquery'], function () {
 	// 判断是否登录
 	$(function () {
 		$.ajax({
-			url: "ajax.php?act=systemParameter",
-			dataType: "json",
+			url: 'ajax.php?act=systemParameter',
+			dataType: 'json',
 			success: function (data) {
-				if (data.code == "0") {
+				if (data.code == 1) {
 					$('.userName').text(data.data.user);
-				}else{
-					window.location.href = "index.html";
+				} else {
+					window.location.href = './';
 				}
 			}
 		})

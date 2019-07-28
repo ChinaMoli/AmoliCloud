@@ -10,7 +10,7 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content="black">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="format-detection" content="telephone=no">
-	<link rel="icon" href="/favicon.ico">
+	<link rel="icon" href="../favicon.ico">
 	<link rel="stylesheet" href="layui/css/layui.css" media="all" />
 	<link rel="stylesheet" href="css/public.css" media="all" />
 </head>
@@ -20,21 +20,21 @@
 		<div class="login_face"><img src="images/Amoli.png" class="userAvatar"></div>
 		<div class="layui-form-item input-item">
 			<label for="userName">用户名</label>
-			<input type="text" placeholder="请输入用户名" class="layui-input userName" lay-verify="required">
+			<input type="text" name="user" placeholder="请输入用户名" class="layui-input" lay-verify="required">
 		</div>
 		<div class="layui-form-item input-item">
 			<label for="password">密码</label>
-			<input type="password" placeholder="请输入密码" class="layui-input password" lay-verify="required">
+			<input type="password" name="pass" placeholder="请输入密码" class="layui-input " lay-verify="required">
 		</div>
 		<div class="layui-form-item">
 			<button class="layui-btn layui-block" lay-submit="" lay-filter="login">登录</button>
 		</div>
 		<div class="layui-form-item">
-			<a class="layui-btn layui-block" href="/">返回首页</a>
+			<a class="layui-btn layui-block" href="../">返回首页</a>
 		</div>
 	</form>
 	<script type="text/javascript" src="layui/layui.js"></script>
-	<script type="text/javascript" src="js/index.js"></script>
+	<script type="text/javascript" src="js/index.js?v=4.2.1"></script>
 </body>
 
 </html>
