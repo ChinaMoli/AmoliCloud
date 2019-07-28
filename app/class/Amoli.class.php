@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../sdk/oss/autoload.php';
 require_once __DIR__ . '/../sdk/cos/autoload.php';
+
 use OSS\OssClient;
 use OSS\Core\OssException;
 use OSS\Model\CorsConfig;
@@ -159,7 +160,7 @@ class Amoli
     /**
      * 对WINNT服务器进行编码
      * @param $data 需要编码的数据
-     * @param $dir 判断是否为路径 
+     * @param $dir  判断是否为路径 
      * @return 编码后数据
      */
     public function getEncoding($data, $dir = false)
@@ -184,16 +185,123 @@ class Amoli
     }
 
     /**
-     * 对Get的Dir进行编码处理
-     * @param $data 需要编码的数据
-     * @return 编码后数据
+     * 分享文件
+     * @param $data 数据
+     * @return 分享文件URL
      */
-    public function DirEncoding($data)
+    public function postShare($data)
     {
-        preg_match('/dir=(.*)/i', $data, $dir); // 用正则提取 $_SERVER["QUERY_STRING"] 里的 $dir=”
-        $dir = str_replace("+", "%2B", $dir[1]); // 替换$dir[1]里面的 “+”，后赋值给 $dir
-        $data = UrlDecode($dir); // 将得到的$dir进行URL解码
-        return $data;
+        // 取网站域名
+        $url = 'http://';
+        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') $url = 'https://';
+        ($_SERVER['SERVER_PORT'] != 80 && $_SERVER['SERVER_PORT'] != 443) ? $url .= $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT'] : $url .= $_SERVER['SERVER_NAME'];
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'http://api.t.sina.com.cn/short_url/shorten.json');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, 'source=3271760578&url_long=' . $url . '?'  . $data);
+        $result = json_decode(curl_exec($ch));
+        curl_close($ch);
+        $url_short = $result[0]->url_short;
+        $result = str_replace('http://t.cn/', $url . '/share.php?s=', $url_short);
+        return $result;
+    }
+
+    /**
+     * 获取分享文件数据
+     * @param $s 字符串
+     * @return 分享文件内容
+     */
+    public function getShare($s)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'http://api.t.sina.com.cn/short_url/expand.json');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, 'source=3271760578&url_short=http://t.cn/' . $s);
+        $result = json_decode(curl_exec($ch));
+        if ($result->error_code) return false;
+        curl_close($ch);
+        $data = $result[0]->url_long;
+        $data = base64_decode(substr($data, strpos($data, '?') + 1));
+        $data = explode('{/}', $data);
+        if (!$data[2]) return false;
+        $name = $data[0];
+        $wz = strripos($data[0], '/');
+        if ($wz) $name = substr($data[0], $wz + 1);
+        // 获取文件后戳
+        switch ($this->getStamp($name)) {
+            case "zip":
+            case "rar":
+            case "7z":
+                $type = "file_zip";
+                break;
+            case "jpg":
+            case "png":
+            case "bmp":
+            case "gif":
+            case "ico":
+                $type = "file_img";
+                break;
+            case "htm":
+            case "html":
+                $type = "file_html";
+                break;
+            case "php":
+            case "css":
+            case "jsp":
+            case "js":
+                $type = "file_code";
+                break;
+            case "exe":
+                $type = "file_exe";
+                break;
+            case "docx":
+            case "doc":
+                $type = "file_word";
+                break;
+            case "xlsx":
+            case "xls":
+                $type = "file_excel";
+                break;
+            case "pptx":
+            case "ppt":
+                $type = "file_ppt";
+                break;
+            case "pdf":
+                $type = "file_pdf";
+                break;
+            case "psd":
+                $type = "file_psd";
+                break;
+            case "mp4":
+                $type = "file_video";
+                break;
+            case "mp3":
+                $type = "file_music";
+                break;
+            case "txt":
+                $type = "file_txt";
+                break;
+            case "wjj":
+                $type = "folder";
+                break;
+            case "apk":
+                $type = "file_apk";
+                break;
+            default:
+                $type = "file";
+        }
+        $result = [
+            'name' => $name,
+            'dir' => $data[0],
+            'type' => $type,
+            'time' => $data[1],
+            'size' => $data[2]
+        ];
+        return $result;
     }
 
     /**
@@ -207,11 +315,15 @@ class Amoli
         $folder = [];
         $file2 = [];
         $list = scandir($dir);
+        $encode = false;
+        // 判断是否需要进行编码
+        if (!json_encode($list)) $encode = true;
         foreach ($list as $file) {
             $file_location = $dir . $file;
             $filesize = filesize($file_location);
             $filestime = date("Y-m-d H:i", filemtime($file_location));
-            $file = $this->getEncoding($file);
+            // 判断是否需要进行编码
+            if ($encode) $file = $this->getEncoding($file);
             if (is_dir($file_location) && $file != '.' && $file != '..') {
                 $folder[] = [
                     'type' => 'wjj',
@@ -332,13 +444,16 @@ class Amoli
             $signedUrl = $ossClient->signUrl($bucket, $object, 120, 'GET', $options);
             // 自定义域名
             if ($ossdomain) {
+                // 协议
                 strstr($signedUrl, "http://") ? $protocol = 'http://' : $protocol = 'https://';
-                $url = str_replace($protocol, $protocol . $bucket . '.', $endpoint);
-                $signedUrl = str_replace($url, $protocol . $ossdomain, $signedUrl);
+                // 文件URL
+                $fileUrl = substr($signedUrl, strpos($signedUrl, '/', 10));
+                // 下载地址 协议+自定义域名+文件Url
+                $signedUrl = $protocol . $ossdomain . $fileUrl;
             }
-            return ['code' => '0', 'msg' => true, 'url' => $signedUrl];
+            return ['code' => 1, 'msg' => '获取成功！', 'data' => ['url' => $signedUrl]];
         } catch (OssException $e) {
-            return ['code' => '-1', 'msg' => $e->getMessage()];
+            return ['code' => 2, 'msg' => $e->getMessage()];
         }
     }
 
@@ -349,13 +464,13 @@ class Amoli
      */
     public function getCosUrl($bucket, $region, $secretId, $secretKey, $object)
     {
-        $cosClient = new Qcloud\Cos\Client(array('region' => $region, 'schema' => 'https', 'credentials' => array('secretId'  => $secretId, 'secretKey' => $secretKey)));
+        $cosClient = new Qcloud\Cos\Client(array('region' => $region, 'credentials' => array('secretId'  => $secretId, 'secretKey' => $secretKey)));
         try {
             $options = array('ResponseContentType' => 'application/octet-stream');
             $signedUrl = $cosClient->getObjectUrl($bucket, $object, '+2 minutes', $options);
-            return ['code' => '0', 'msg' => true, 'url' => $signedUrl];
+            return ['code' => 1, 'msg' => '获取成功！', 'data' => ['url' => $signedUrl]];
         } catch (\Exception $e) {
-            return ['code' => '-1', 'msg' => $e];
+            return ['code' => 2, 'msg' => $e];
         }
     }
 
@@ -369,9 +484,9 @@ class Amoli
         try {
             $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
             $ossClient->deleteObject($bucket, $object);
-            return  ['msg' => 'ok'];
+            return ['code' => 1, 'msg' => '删除成功！'];
         } catch (OssException $e) {
-            return ['msg' => $e->getMessage()];
+            return ['code' => 2, 'msg' => '错误代码：<br>' . $e->getMessage()];
         }
     }
 
@@ -385,9 +500,9 @@ class Amoli
         $cosClient = new Qcloud\Cos\Client(array('region' => $region, 'schema' => 'https', 'credentials' => array('secretId'  => $secretId, 'secretKey' => $secretKey)));
         try {
             $cosClient->deleteObject(array('Bucket' => $bucket, 'Key' => $object));
-            return  ['msg' => 'ok'];
+            return ['code' => 1, 'msg' => '删除成功！'];
         } catch (\Exception $e) {
-            return ['msg' => $e];
+            return ['code' => 2, 'msg' => '错误代码：<br>' . $e];
         }
     }
 
@@ -400,9 +515,10 @@ class Amoli
     {
         $corsConfig = new CorsConfig();
         $rule = new CorsRule();
-        $rule->addAllowedHeader("*");
-        $rule->addAllowedOrigin("*");
-        $rule->addAllowedMethod("POST");
+        $rule->addAllowedHeader('*');
+        $rule->addAllowedOrigin('*');
+        $rule->addAllowedMethod('GET');
+        $rule->addAllowedMethod('POST');
         $rule->setMaxAgeSeconds(0);
         $corsConfig->addRule($rule);
         $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
@@ -422,7 +538,7 @@ class Amoli
             'CORSRules' => array(
                 array(
                     'AllowedHeaders' => array('*',),
-                    'AllowedMethods' => array('POST'),
+                    'AllowedMethods' => array('GET,POST'),
                     'AllowedOrigins' => array('*'),
                     'ExposeHeaders' => array('*'),
                     'MaxAgeSeconds' => 1
@@ -523,7 +639,7 @@ class Amoli
         $arr = ['expiration' => $expiration, 'conditions' => $conditions];
         $policy = json_encode($arr);
         $base64_policy = base64_encode($policy);
-        $KeyTime = (string)($time - 60) . ';' . (string)($time + 3600);
+        $KeyTime = (string) ($time - 60) . ';' . (string) ($time + 3600);
         $signature = getAuthorization($secretId, $secretKey, $KeyTime);
         return [
             'dir' => $dir,
@@ -545,11 +661,10 @@ class Amoli
         try {
             $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
             $ossClient->putObject($bucket, $dir, '');
-            $msg = true;
+            return ['code' => 1, 'msg' => '创建成功！'];
         } catch (OssException $e) {
-            $msg = $e;
+            return ['code' => 2, 'msg' => '错误代码：<br>' . $e];
         }
-        return ['code' => '0', 'msg' => $msg];
     }
 
     /**
@@ -566,10 +681,9 @@ class Amoli
                 'Key' => $dir,
                 'Body' => ''
             ));
-            $msg = true;
+            return ['code' => 1, 'msg' => '创建成功！'];
         } catch (\Exception $e) {
-            $msg = $e;
+            return ['code' => 2, 'msg' => '错误代码：<br>' . $e];
         }
-        return ['code' => '0', 'msg' => $msg];
     }
 }
