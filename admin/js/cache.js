@@ -45,13 +45,13 @@ layui.use(['form', 'jquery', "layer"], function () {
         } else {
             var lockPwd = $("#lockPwd").val();
             $.ajax({
-                url: "ajax.php?act=lock",
-                type: "post",
+                url: 'ajax.php?act=lock',
+                type: 'post',
                 data: { 'lockPwd': lockPwd },
-                dataType: "json",
+                dataType: 'json',
                 success: function (data) {
-                    if (data.data.msg == "ok") {
-                        window.sessionStorage.setItem("lockcms", false);
+                    if (data.code == 1) {
+                        window.sessionStorage.setItem('lockcms', false);
                         $(this).siblings(".admin-header-lock-input").val('');
                         layer.closeAll("page");
                     } else {

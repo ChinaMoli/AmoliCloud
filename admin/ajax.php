@@ -208,9 +208,9 @@ switch ($act) {
     case 'lock': // 锁屏验证
         $lockPwd = MD5($_POST['lockPwd'] . '$$Www.Amoli.Co$$');
         if ($lockPwd == $pass) {
-            $result = ['msg' => 'ok'];
+            $result = ['code' => 1, 'msg' => '成功！'];
         } else {
-            $result = ['msg' => 'no'];
+            $result = ['code' => 2, 'msg' => '密码错误！'];
         }
         break;
     case 'setaccount': // 修改后台帐号密码
