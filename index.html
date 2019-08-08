@@ -12,11 +12,13 @@
 	<script src="static/js/bootstrap.min.js"></script>
 	<script src="static/layer/layer.js"></script>
 	<style type="text/css">
-	.ico{width:18px}.size{width:100px}.time{width:140px}.icon{width:1em;height:1em;vertical-align:-0.15em;fill:currentColor;overflow:hidden;}.github{color:#fff;fill:currentColor;width:1.4rem;height:1.4rem;vertical-align:middle;margin-top:-3px}
+	.ico{width:18px}.size{width:100px}.time{width:140px}.icon{width:1em;height:1em;vertical-align:-0.15em;fill:currentColor;overflow:hidden;}.github{color:#fff;fill:currentColor;width:1.4rem;height:1.4rem;vertical-align:middle;margin-top:-3px}a:link{text-decoration:none}
+	/* 滑块验证码 */
+	.captcha{width:100%;height:100%;display:flex;align-items:center;justify-content:center}#embed-captcha{width:300px;margin:0 auto;margin-top:-50px}#embed-captcha:empty{display:none}#embed-captcha::after{color:gray;display:block;font-size:13px;margin-top:5px;content:'使用你的手，缓慢且准确的滑过去！'}.show{display:block}.hide{display:none}#notice{color:red}
 	</style>
 </head>
 
-<body>
+<body onhashchange="doHash()">
 	<nav class="navbar navbar-expand-md bg-dark navbar-dark">
 		<div class="container">
 			<b><a class="navbar-brand" href="./"></a></b>
@@ -28,12 +30,8 @@
 					<li class="nav-item">
 						<a class="nav-link" href="./">首页</a>
 					</li>
-					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">赞助商</a>
-						<div class="dropdown-menu">
-							<a class="dropdown-item" target="_blank" href="https://chuangke.aliyun.com/invite?userCode=np5jn1ru">阿里云</a>
-							<a class="dropdown-item" target="_blank" href="https://www.90qh.com/tui_62382.html">九零启航</a>
-						</div>
+					<li class="nav-item">
+						<a class="nav-link" target="_blank" href="https://chuangke.aliyun.com/invite?userCode=np5jn1ru">阿里云红包</a>
 					</li>
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">友情链接</a>
@@ -56,10 +54,10 @@
 	<br>
 	<div class="container">
 		<ol class="breadcrumb">
-			<a class="breadcrumb-item" href="javascript:;" onclick="getList('')">首页</a>
+			<a class="breadcrumb-item" href="javascript:;" onclick="getList()">首页</a>
 			<span id="nav"></span>
 		</ol>
-		<table class="table table-hover table-bordered table-sm">
+		<table class="table table-hover table-sm">
 			<thead class="table-active">
 				<th class="ico"></th>
 				<th>Name</th>
@@ -77,7 +75,8 @@
 		</p>
 	</div>
 	<script src="static/js/tj.js"></script>
-	<script src="static/js/main.js?v=4.2.1"></script>
+	<script src="static/js/gt.js"></script>
+	<script src="static/js/main.js?v=4.2.2"></script>
 </body>
 
 </html>

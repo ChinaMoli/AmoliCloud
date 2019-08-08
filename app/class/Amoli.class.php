@@ -194,7 +194,10 @@ class Amoli
         // 取网站域名
         $url = 'http://';
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') $url = 'https://';
-        ($_SERVER['SERVER_PORT'] != 80 && $_SERVER['SERVER_PORT'] != 443) ? $url .= $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT'] : $url .= $_SERVER['SERVER_NAME'];
+        $url .= $_SERVER['HTTP_HOST'];
+        // 判断是否安装在根目录
+        $name = dirname(dirname($_SERVER['SCRIPT_NAME']));
+        ($name == DIRECTORY_SEPARATOR) ? $dir = '' : $dir = $name;
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'http://api.t.sina.com.cn/short_url/shorten.json');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -204,7 +207,7 @@ class Amoli
         $result = json_decode(curl_exec($ch));
         curl_close($ch);
         $url_short = $result[0]->url_short;
-        $result = str_replace('http://t.cn/', $url . '/share.php?s=', $url_short);
+        $result = str_replace('http://t.cn/', $url . $dir . '/share.php?s=', $url_short);
         return $result;
     }
 
@@ -225,6 +228,7 @@ class Amoli
         if ($result->error_code) return false;
         curl_close($ch);
         $data = $result[0]->url_long;
+        if (!strpos($data, $_SERVER['HTTP_HOST'])) return false;
         $data = base64_decode(substr($data, strpos($data, '?') + 1));
         $data = explode('{/}', $data);
         if (!$data[2]) return false;
@@ -319,11 +323,12 @@ class Amoli
         // 判断是否需要进行编码
         if (!json_encode($list)) $encode = true;
         foreach ($list as $file) {
-            $file_location = $dir . $file;
-            $filesize = filesize($file_location);
-            $filestime = date("Y-m-d H:i", filemtime($file_location));
+            $file_location = $dir . $this->getEncoding($file, true);
             // 判断是否需要进行编码
-            if ($encode) $file = $this->getEncoding($file);
+            if ($encode) {
+                $file_location = $dir . $file;
+                $file = $this->getEncoding($file);
+            };
             if (is_dir($file_location) && $file != '.' && $file != '..') {
                 $folder[] = [
                     'type' => 'wjj',
@@ -332,6 +337,8 @@ class Amoli
                     'time' => ''
                 ];
             } elseif ($file != '.' && $file != '..') {
+                $filesize = filesize($file_location);
+                $filestime = date('Y-m-d H:i', filemtime($file_location));
                 $file2[] = [
                     'type' => $this->getStamp($file),
                     'name' => $file,

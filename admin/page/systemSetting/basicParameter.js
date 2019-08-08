@@ -5,16 +5,16 @@ layui.use(['form', 'layer', 'jquery'], function () {
 
 	// 加载网站设置
 	$.ajax({
-		url: "../../ajax.php?act=systemParameter&bool=true",
-		type: "get",
-		dataType: "json",
+		url: '../../ajax.php?act=systemParameter&bool=true',
+		dataType: 'json',
 		success: function (data) {
 			var item = data.data,
 				oss = item.oss,
 				cos = item.cos;
-			$(".name").val(item.name);
+			$('.name').val(item.name);
 			(!item.type) ? item.type = 'local' : '';//默认为本地存储
-			$('input[type="radio"][value="' + item.type + '"]').prop('checked', true);
+			$('input[type="radio"][name="type"][value="' + item.type + '"]').prop('checked', true);
+			$('input[type="radio"][name="verify"][value="' + item.verify + '"]').prop('checked', true);
 			RadioOn(item.type);
 			$(".localhost").val(item.localhost);
 
@@ -85,4 +85,23 @@ layui.use(['form', 'layer', 'jquery'], function () {
 		}
 		form.render();// 更新单选框状态
 	}
+
+	// 目录判断
+	form.verify({
+		host: function (value) {
+			if (value) {
+				if (value.substr(0, 1) == '/') {
+					return '目录名称不能以/开头';
+				} else if (value.substr(-1) != '/') {
+					return '目录名称必须以/结尾';
+				}
+			}
+		},
+		Endpoint: function (value) {
+			var regex =/^http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?$/i;
+			if(!regex.test(value)){
+				return 'Endpoint格式错误';
+			}
+		}
+	})
 })

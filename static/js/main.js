@@ -1,11 +1,13 @@
+var nowHash, verify;
 // 网页初始化
 $(function () {
-    var version = '4.2.1';
+    var version = '4.2.2';
     $.ajax({
         url: 'Ajax.php?act=getConfig',
-        dataType: "json",
+        dataType: 'json',
         success: function (data) {
             var item = data.data;
+            verify = item.verify;
             // 检测是否安装
             if (!item.install) {
                 layer.open({
@@ -18,10 +20,10 @@ $(function () {
             }
             // 保留版权是对作者最大的尊重。
             console.info('欢迎使用 AmoliCloud!\n当前版本：' + version + ' \n作者：无名氏Studio(https://wums.cn)\n官网：Amoli私有云(https://www.amoli.co)\nGithub：https://github.com/ChinaMoli/AmoliCloud');
-            $("title,.navbar-brand").prepend(item.name);// 配置前端信息
-            $("#record").text(item.record);
+            $('title,.navbar-brand').prepend(item.name);// 配置前端信息
+            $('#record').text(item.record);
             if (item.log) {
-                getList("");
+                doHash();
             } else {
                 layer.open({
                     type: 1,
@@ -30,6 +32,13 @@ $(function () {
                     content: '<div class="container text-right"><br><form onsubmit="return login();"><div class="input-group mb-3"><div class="input-group-prepend"><span class="input-group-text">密码：</span></div><input type="password" class="form-control" id="indexpass"></div><input type="submit" class="btn btn-primary" value="确认"><div><p></p></div></form></div>'
                 });
             }
+        },
+        error: function () {
+            layer.open({
+                title: '提示',
+                content: '请检查当前服务器的PHP版本<br>PHP版本必须高于5.6！',
+                icon: 2,
+            })
         }
     })
 })
@@ -88,14 +97,19 @@ function getType(type) {
     return result;
 }
 // 获取文件和目录
-function getList(ojb, ListNav, thats) {
+function getList(type, ListNav, ojb) {
     layer.load(0, { shade: false });
-    if (ojb == "") {// 网页加载
-        var dir = "";
-    } else if (ojb == "nav") {// 点击导航栏
-        var dir = ListNav;
-    } else { //点击目录
-        var dir = ListNav + $(ojb).text() + "/";
+    var dir = '';
+    switch (type) {
+        case 'nav': case 'hash':
+            dir = ListNav;
+            break;
+        case 'ml':
+            dir = ListNav + $(ojb).text() + '/';
+            break;
+        default:
+            var nav = '<a class="breadcrumb-item"></a>'
+            $('#nav').html(nav);
     }
     $.ajax({
         url: 'Ajax.php?act=getList',
@@ -103,94 +117,149 @@ function getList(ojb, ListNav, thats) {
         data: { 'dir': dir },
         dataType: 'json',
         error: function () {
-            $("#list").html('<th class="text-center" colspan="4">请求错误</th>');
+            $('#list').html('<th class="text-center" colspan="4">请求错误</th>');
             layer.closeAll('loading');
         },
         success: function (data) {
-            $("title,.navbar-brand").prepend(data.name);// 配置前端信息
-            var str = "";
-            $("#list").html('');
-            var item = data.data;
+            setHash(dir);// 设置hash
+            var str,
+                item = data.data;
             for (var i = 0, Max = item.length; i < Max; i++) {
-                if (item[i].type == "wjj") {
-                    var name = '<a href="javascript:;" onclick="getList(this,\'' + dir + '\')">' + item[i].name + '</a>';
+                if (item[i].type == 'wjj') {
+                    var name = '<a href="javascript:;" onclick="getList(\'ml\',\'' + dir + '\',this)">' + item[i].name + '</a>';
                 } else {
-                    var name = '<a href="javascript:;" onclick="Preview(\'' + item[i].type + '\',\'' + item[i].name + '\', \'' + dir + item[i].name + '\')">' + item[i].name + '</a>';
+                    var name = '<a href="javascript:;" onclick="downVerify(\'' + item[i].type + '\',\'' + item[i].name + '\', \'' + dir + item[i].name + '\')">' + item[i].name + '</a>';
                 }
                 str += '<tr><td><svg class="icon" aria-hidden="true"><use xlink:href="#icon-' + getType(item[i].type) + '"></use></svg></td><td>' + name + '</td><td class ="text-right">' + item[i].size + '</td><td class ="text-center">' + item[i].time + '</td></tr>';
             }
-            if (ojb == "") {
-                $("#nav").html("");
+            switch (type) {
+                case 'nav':
+                    $(ojb).nextAll().detach();
+                    break;
+                case 'ml':
+                    var nav = '<a  class="breadcrumb-item" href="javascript:;"  onclick="getList(\'nav\',\'' + dir + '\',this)">' + $(ojb).text() + '</a>';
+                    $('#nav').append(nav);
+                    break;
+                case 'hash':
+                    var nav = '<a class="breadcrumb-item"></a>',
+                        dir2 = '',
+                        arr = dir.split('/'),
+                        Max = arr.length - 1;
+                    for (var i = 0; i < Max; i++) {
+                        dir2 += arr[i] + '/';
+                        nav += '<a  class="breadcrumb-item" href="javascript:;"  onclick="getList(\'nav\',\'' + dir2 + '\',this)">' + arr[i] + '</a>';
+                    }
+                    $('#nav').html(nav);
+                    break;
             }
-            if (ojb != "nav") {
-                var nav = '<a  class="breadcrumb-item" href="javascript:;"  onclick="getList(\'nav\',\'' + dir + '\',this)">' + $(ojb).text() + '</a>';
-                $("#nav").append(nav);
-            } else {
-                $(thats).nextAll().detach();
-            }
-            $("#list").append(str);
+            $('#list').html(str);
             layer.closeAll('loading');
         }
     });
 }
-// 下载文件
-function DownFlie(dir) {
-    $.ajax({
-        url: 'Ajax.php?act=getUrl',
-        type: 'POST',
-        data: { 'dir': dir },
-        dataType: 'json',
-        success: function (data) {
-            if (data.code == 1) {
-                window.location.href = data.data.url;
-            } else {
-                layer.alert('错误代码：<br>' + data.msg, { icon: 2 });
+// 下载验证
+function downVerify(type, title, dir) {
+    if (verify) {
+        layer.open({
+            type: 1,
+            skin: 'layui-layer-rim',
+            area: ['350px', '250px'],
+            title: '你需要证明你不是机器人',
+            content: '<div class="captcha">' +
+                '<div id="embed-captcha"></div>' +
+                '<p id="wait" class="show">正在加载验证码......</p>' +
+                '<p id="notice" class="hide">请先完成验证</p>' +
+                '</div>'
+        });
+        $.ajax({
+            url: 'Ajax.php?act=verify&t=' + (new Date()).getTime(),
+            dataType: 'json',
+            success: function (data) {
+                initGeetest({
+                    'gt': data.gt,
+                    'challenge': data.challenge,
+                    'new_captcha': data.new_captcha,
+                    'product': 'embed',
+                    'offline': !data.success
+                }, handlerEmbed);
             }
-        }
-    })
+        });
+        var handlerEmbed = function (captchaObj) {
+            $('#embed-submit').click(function (e) {
+                var validate = captchaObj.getValidate();
+                if (!validate) {
+                    $('#notice')[0].className = 'show';
+                    setTimeout(function () {
+                        $('#notice')[0].className = 'hide';
+                    }, 1000);
+                    e.preventDefault();
+                }
+            });
+
+            captchaObj.appendTo('#embed-captcha');
+            captchaObj.onReady(function () {
+                $('#wait')[0].className = 'hide';
+            });
+            captchaObj.onSuccess(function () {
+                var result = captchaObj.getValidate(),
+                    gtData = {
+                        'geetest_challenge': result.geetest_challenge,
+                        'geetest_validate': result.geetest_validate,
+                        'geetest_seccode': result.geetest_seccode
+                    };
+                layer.closeAll('page');
+                Preview(type, title, dir, gtData);
+            });
+        };
+    } else {
+        Preview(type, title, dir);
+    }
 }
-// 预览文件
-function Preview(type, title, dir) {
+// 下载、预览文件
+function Preview(type, title, dir, gtData = {}) {
+    var postData = Object.assign({ 'dir': dir }, gtData);
     $.ajax({
         url: 'Ajax.php?act=getUrl',
         type: 'POST',
-        data: { 'dir': dir },
+        data: postData,
         dataType: 'json',
         success: function (data) {
+            if (data.code == 2) {
+                layer.alert('错误信息：' + data.msg, { title: '下载出错', icon: 2 });
+                return;
+            }
             var url = data.data.url,
-                result;
+                result,
+                lw = '60%',
+                lh = '70%';
             switch (type) {
-                case "mp3":
+                case 'mp3':
+                    lw = 'auto', lh = 'auto';
                     result = '<audio width="100%" height="100%" controls><source src="' + url + '" type="audio/mpeg">您的浏览器不支持该音频格式。</audio>';
                     break;
-                case "mp4":
-                    result = '<video width="100%" height="100%" controls><source src="' + url + '" type="video/mp4">您的浏览器不支持该视频格式。</video>';
+                case 'mp4':
+                    if (window.screen.width < 1024) {
+                        lw = '100%', lh = 'auto';
+                    };
+                    result = '<video width="100%" height="100%" controls style="object-fit: fill"><source src="' + url + '" type="video/mp4">您的浏览器不支持该视频格式。</video>';
                     break;
-                case "jpg": case "png": case "bmp": case "gif": case "ico":
-                    result = '<img src="' + url + '" class="img-fluid">';
-                    break;
+                case 'jpg': case 'png': case 'bmp': case 'gif': case 'ico':
+                    layer.photos({
+                        photos: { 'data': [{ 'src': url }] },
+                        anim: 5
+                    });
+                    return;
                 default:
-                    DownFlie(dir);
+                    window.location.href = url;
                     return;
             }
             layer.open({
                 type: 1,
                 title: title + ' - 文件预览',
-                area: ['80%', '70%'],
+                area: [lw, lh],
                 shadeClose: true,
                 shade: 0.8,
-                content:
-                    '<div class="container">'
-                    + '<br>'
-                    + '<div class="text-center">'
-                    + result
-                    + '</div>'
-                    + '<br>'
-                    + '<div class="text-right">'
-                    + '<button type="button" class="btn btn-outline-secondary btn-sm"><a class="dropdown-item" target="_blank" href="' + url + '"><svg class="icon" aria-hidden="true"><use xlink:href="#icon-down"></use></svg>下载</a></button>'
-                    + '<p> </p>'
-                    + '</div>'
-                    + '</div>'
+                content: result
             });
         }
     })
@@ -211,12 +280,27 @@ function login() {
                 setTimeout(function () {
                     if (data.code == 1) {
                         layer.closeAll();
-                        getList("");
+                        doHash();
                     }
                 }, 500)
-
             }, 500);
         }
     })
     return false;
+}
+// 设置hash
+function setHash(dir) {
+    location.hash = '/' + dir;
+    nowHash = dir;
+}
+// 监控hash
+function doHash() {
+    if (location.hash.substr(-1) != '/') {
+        getList();
+        return;
+    }
+    var hash = decodeURI(location.hash.replace('#/', ''));
+    if (hash != nowHash) {
+        getList('hash', hash);
+    }
 }

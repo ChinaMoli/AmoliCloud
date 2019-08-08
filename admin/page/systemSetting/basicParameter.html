@@ -36,15 +36,15 @@
 					<legend>本地存储 - 配置</legend>
 					<div class="layui-field-box LocalConfig">
 						<div class="layui-form-item">
-							<label class="layui-form-label">格式：</label>
+							<label class="layui-form-label">目录路径</label>
 							<div class="layui-input-block">
-								<span class="layui-form-item" style="color: #FF5722;">目录名称，从根目录开始，必须以"/"结尾，例如down/，text/img/<br>留空即为根目录</span>
+								<input type="text" name="localhost" placeholder="请输入目录路径 请按照格式填写" lay-verify="host" class="layui-input localhost">
 							</div>
 						</div>
 						<div class="layui-form-item">
-							<label class="layui-form-label">目录路径</label>
+							<label class="layui-form-label">格式：</label>
 							<div class="layui-input-block">
-								<input type="text" name="localhost" placeholder="请输入目录路径 请按照格式填写" class="layui-input localhost">
+								<span class="layui-form-item layui-red">目录名称，从根目录开始，必须以"/"结尾<br>例如：down/、down/file/<br>留空即为根目录</span>
 							</div>
 						</div>
 					</div>
@@ -54,19 +54,18 @@
 							<div class="layui-input-inline">
 								<input type="text" name="OssBucket" placeholder="请输入 Bucket" class="layui-input OssBucket">
 							</div>
-							<div class="layui-form-mid" style="color: #FF5722;">OSS配置教程：&nbsp;<a target="_blank" href="https://wums.cn/archives/AMoliCloud-deploy.html">点此查看</a></div>
+							<div class="layui-form-mid layui-red">OSS配置教程：&nbsp;<a target="_blank" href="https://wums.cn/archives/AMoliCloud-deploy.html">点此查看</a></div>
 						</div>
 						<div class="layui-form-item">
 							<label class="layui-form-label">Endpoint</label>
 							<div class="layui-input-block">
-								<input type="text" name="endpoint" placeholder="请输入 Endpoint 请按照格式填写" class="layui-input endpoint">
+								<input type="text" name="endpoint" placeholder="请输入 Endpoint 请按照格式填写" lay-verify="Endpoint" class="layui-input endpoint">
 							</div>
 						</div>
 						<div class="layui-form-item">
 							<label class="layui-form-label">格式：</label>
 							<div class="layui-input-block">
-								<span class="layui-form-item"
-									style="color: #FF5722;">http(s)://+EndPoint(地域节点)如果网站采用https协议，请用：https://+EndPoint</span>
+								<span class="layui-form-item layui-red">http(s)://+EndPoint(地域节点)<br>如果网站采用https协议，请用：https://+EndPoint<br>例如：http://oss-cn-hangzhou.aliyuncs.com</span>
 							</div>
 						</div>
 						<div class="layui-form-item">
@@ -90,13 +89,13 @@
 						<div class="layui-form-item">
 							<label class="layui-form-label">目录路径</label>
 							<div class="layui-input-block">
-								<input type="text" name="osshost" placeholder="请输入目录路径 请按照格式填写" class="layui-input osshost">
+								<input type="text" name="osshost" placeholder="请输入目录路径 请按照格式填写" lay-verify="host" class="layui-input osshost">
 							</div>
 						</div>
 						<div class="layui-form-item">
 							<label class="layui-form-label">格式：</label>
 							<div class="layui-input-block">
-								<span class="layui-form-item" style="color: #FF5722;">目录名称，必须以"/"结尾，例如down/，text/img/<br>留空即为根目录</span>
+								<span class="layui-form-item layui-red">目录名称，从根目录开始，必须以"/"结尾<br>例如：down/、down/file/<br>留空即为根目录</span>
 							</div>
 						</div>
 					</div>
@@ -106,14 +105,14 @@
 							<div class="layui-input-inline">
 								<input type="text" name="CosBucket" placeholder="请输入 空间名称" class="layui-input CosBucket">
 							</div>
-							<div class="layui-form-mid" style="color: #FF5722;">COS配置教程：&nbsp;<a target="_blank" href="https://wums.cn/archives/AmoliCloud-CosConfig.html">点此查看</a></div>
+							<div class="layui-form-mid layui-red">COS配置教程：&nbsp;<a target="_blank" href="https://wums.cn/archives/AmoliCloud-CosConfig.html">点此查看</a></div>
 						</div>
 						<div class="layui-form-item">
 							<label class="layui-form-label">所属地域</label>
 							<div class="layui-input-inline">
 								<input type="text" name="region" placeholder="请输入 所属地域" class="layui-input region">
 							</div>
-							<div class="layui-form-mid" style="color: red;">格式:ap-地域 例如:ap-chengdu</div>
+							<div class="layui-form-mid layui-red">格式:ap-地域 例如:ap-chengdu</div>
 						</div>
 						<div class="layui-form-item">
 							<label class="layui-form-label">SecretId</label>
@@ -130,13 +129,13 @@
 						<div class="layui-form-item">
 							<label class="layui-form-label">目录路径</label>
 							<div class="layui-input-block">
-								<input type="text" name="coshost" placeholder="请输入目录路径 请按照格式填写" class="layui-input coshost">
+								<input type="text" name="coshost" placeholder="请输入目录路径 请按照格式填写" lay-verify="host" class="layui-input coshost">
 							</div>
 						</div>
 						<div class="layui-form-item">
 							<label class="layui-form-label">格式：</label>
 							<div class="layui-input-block">
-								<span class="layui-form-item" style="color: #FF5722;">目录名称，必须以"/"结尾，例如down/，text/img/<br>留空即为根目录</span>
+								<span class="layui-form-item layui-red">目录名称，从根目录开始，必须以"/"结尾<br>例如：down/、down/file/<br>留空即为根目录</span>
 							</div>
 						</div>
 					</div>
@@ -147,7 +146,14 @@
 				<div class="layui-input-inline">
 					<input type="text" name="indexpass" placeholder="请输入前台登录密码" class="layui-input indexpass">
 				</div>
-				<div class="layui-form-mid" style="color: #FF5722;">留空即为关闭验证</div>
+				<div class="layui-form-mid layui-red">留空即为关闭验证</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">下载验证</label>
+				<div class="layui-input-inline">
+					<input type="radio" name="verify" value="true" title="开">
+					<input type="radio" name="verify" value="false" title="关" checked>
+				</div>
 			</div>
 			<div class="layui-form-item">
 				<label class="layui-form-label">网站备案号</label>
@@ -170,7 +176,7 @@
 		</div>
 	</form>
 	<script type="text/javascript" src="../../layui/layui.js"></script>
-	<script type="text/javascript" src="basicParameter.js?v=4.2.1"></script>
+	<script type="text/javascript" src="basicParameter.js?v=4.2.2"></script>
 </body>
 
 </html>

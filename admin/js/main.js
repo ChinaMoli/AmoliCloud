@@ -1,7 +1,7 @@
 var user = 'Amoli私有云';
 layui.use(['jquery'], function () {
     var $ = layui.jquery,
-        version = '4.2.1';
+        version = '4.2.2';
     //icon动画
     $(".panel a").hover(function () {
         $(this).find(".layui-anim").addClass("layui-anim-scaleSpring");

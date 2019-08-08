@@ -15,9 +15,9 @@ layui.use(['layer', 'jquery', 'table'], function () {
 		size: 'sm',
 		cols: [[
 			{ field: 'type', title: '', templet: function (d) { return getType(d.type); }, width: 46, align: "center", unresize: true },
-			{ field: 'name', title: '文件名', event: 'setSign', style: 'cursor: pointer;' },
-			{ field: 'size', title: '文件大小', width: 100, align: 'right', unresize: true },
-			{ field: 'time', title: '更新时间', width: 150, align: 'center', unresize: true },
+			{ field: 'name', title: '文件名', event: 'setSign', style: 'cursor: pointer;', sort: true },
+			{ field: 'size', title: '文件大小', width: 100, align: 'right', unresize: true, sort: true },
+			{ field: 'time', title: '上传日期', width: 150, align: 'center', unresize: true, sort: true },
 			{ title: '操作', width: 180, templet: '#ListBar', align: "center", unresize: true }
 		]]
 	});
@@ -148,7 +148,7 @@ layui.use(['layer', 'jquery', 'table'], function () {
 						if (data.code == 1) {
 							window.location.href = data.data.url;
 						} else {
-							layer.alert('错误代码：<br>' + data.msg, { icon: 2 });
+							layer.alert('错误信息：' + data.msg, { title: '下载出错', icon: 2 });
 						}
 					}
 				})

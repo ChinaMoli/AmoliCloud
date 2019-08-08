@@ -27,7 +27,7 @@ switch ($act) {
         ($Cookie == md5($indexpass) || !$indexpass) ? $log = true : $log = false;
         // 判断是否安装
         file_exists('install/install.lock') ? $install = true : $install = false;
-        $result = ['code' => 1, 'msg' => '获取成功！', 'data' => ['name' => $C->get('name'),  'record' => $C->get('record'), 'install' => $install, 'log' => $log]];
+        $result = ['code' => 1, 'msg' => '获取成功！', 'data' => ['name' => $C->get('name'),  'record' => $C->get('record'), 'install' => $install, 'log' => $log, 'verify' => $C->get('verify', false)]];
         break;
     case 'getList': // 加载目录
         $dir = $_POST['dir'];
@@ -47,8 +47,36 @@ switch ($act) {
         }
         $result = ['code' => 1, 'msg' => '获取成功', 'data' => $list];
         break;
+    case 'verify': // 生成验证
+        require_once __DIR__ . '/app/class/Geetestlib.class.php';
+        $GtSdk = new GeetestLib('Amoli', '1552294270');
+        $data = [
+            'user_id' => $C->get('name'),
+            'client_type' => 'web',
+            'ip_address' => $_SERVER["REMOTE_ADDR"]
+        ];
+        $status = $GtSdk->pre_process($data, 1);
+        echo $GtSdk->get_response_str();
+        return;
     case 'getUrl': // 获取文件下载Url
+        if ($C->get('verify', false)) {
+            require_once __DIR__ . '/app/class/Geetestlib.class.php';
+            $GtSdk = new GeetestLib('Amoli', '1552294270');
+            $data = [
+                'user_id' => $C->get('name'),
+                'client_type' => 'web',
+                'ip_address' => $_SERVER["REMOTE_ADDR"]
+            ];
+            if (!$GtSdk->success_validate($_POST['geetest_challenge'], $_POST['geetest_validate'], $_POST['geetest_seccode'], $data)) {
+                $result = ['code' => 2, 'msg' => '非法访问！'];
+                break;
+            }
+        }
         $dir = $_POST['dir'];
+        if (!$dir) {
+            $result = ['code' => 2, 'msg' => '非法访问！'];
+            break;
+        }
         switch ($type) {
             case 'local':
                 $url = '/' . $C->get('localhost') . $dir;

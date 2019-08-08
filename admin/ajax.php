@@ -139,7 +139,7 @@ switch ($act) {
             'tongji' => ($_GET['bool']) ? file_get_contents('../static/js/tj.js') : '',
             'server' => PHP_OS,
             'host' => $_SERVER['HTTP_HOST'],
-            'root' => $_SERVER['DOCUMENT_ROOT'],
+            'root' => $_SERVER['DOCUMENT_ROOT'] . dirname(dirname($_SERVER['SCRIPT_NAME'])),
             'server_software' => $_SERVER['SERVER_SOFTWARE'],
             'php_version' => PHP_VERSION,
             'upload_max' => get_cfg_var("file_uploads") ? get_cfg_var("upload_max_filesize") : '空间不允许上传',
@@ -170,6 +170,8 @@ switch ($act) {
         ];
         $C->set('cos', $cos);
         $C->set('indexpass', trim($_POST['indexpass']));
+        ($_POST['verify'] == 'true') ? $verify = true : $verify = false;
+        $C->set('verify', $verify);
         $C->set('record', $_POST['record']);
         $msg = $C->save();
         //统计代码
