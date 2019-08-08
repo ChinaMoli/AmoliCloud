@@ -150,7 +150,7 @@ if (file_exists('install.lock')) {
                 <div class="layui-form-item">
                     <label class="layui-form-label">管理员密码</label>
                     <div class="layui-input-inline">
-                        <input type="password" class="layui-input" name="pass" lay-verify="required">
+                        <input type="password" class="layui-input" name="pass" lay-verify="required|pass">
                     </div>
                     <div class="layui-form-mid" style="color: #FF5722;">管理员密码最少6位 *必填</div>
                 </div>
@@ -167,6 +167,11 @@ if (file_exists('install.lock')) {
                 user: function (value) {
                     if (value.length < 5) {
                         return "用户名长度不能小于5位";
+                    }
+                },
+                pass: function (value) {
+                    if (value.length < 6) {
+                        return "密码长度不能小于6位";
                     }
                 }
             })
